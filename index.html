@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TensorFlow.js Tutorial</title>
+
+  <!-- Import TensorFlow.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <!-- Import tfjs-vis -->
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
+
+  <!-- Import the main script file -->
+  <script src="script.js"></script>
+
+</head>
+
+<body>
+    
+
+    <p>Upload Training Data Here</p>
+    <input id="fileuploadTrain" name="trainData" type="file" />
+    <p>Upload Testing Data Here</p>
+    <input id="fileuploadTest" name="testData" type="file" />
+    
+</br>
+</br>
+
+    <button id="train" onmousedown="" >Train</button>
+    <button id="predict" onmousedown="" >Predict</button>
+    <script src="index.js"></script>
+
+    <div id="console"></div>
+    
+</body>
+</html>
