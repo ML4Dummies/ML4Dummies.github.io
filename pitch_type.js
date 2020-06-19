@@ -20,36 +20,42 @@ const TEST_DATA_LENGTH = 700;
 
 // Converts a row from the CSV into features and labels.
 // Each feature field is normalized within training data constants
-const transform =
-    ({xs, ys}) => {
-      const values = [
-        normalize(xs.vx0, VX0_MIN, VX0_MAX),
-        normalize(xs.vy0, VY0_MIN, VY0_MAX),
-        normalize(xs.vz0, VZ0_MIN, VZ0_MAX), normalize(xs.ax, AX_MIN, AX_MAX),
-        normalize(xs.ay, AY_MIN, AY_MAX), normalize(xs.az, AZ_MIN, AZ_MAX),
-        normalize(xs.start_speed, START_SPEED_MIN, START_SPEED_MAX),
-        xs.left_handed_pitcher
-      ];
-      return {xs: values, ys: ys.pitch_code};
-    }
 
-const trainingData =
-    tf.data.csv(TRAIN_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
-        .map(csvTransform)
-        .shuffle(TRAINING_DATA_LENGTH)
-        .batch(100);
 
-// Load all training data in one batch to use for evaluation
-const trainingValidationData =
-    tf.data.csv(TRAIN_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
-        .map(csvTransform)
-        .batch(TRAINING_DATA_LENGTH);
 
-// Load all test data in one batch to use for evaluation
-const testValidationData =
-    tf.data.csv(TEST_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
-        .map(csvTransform)
-        .batch(TEST_DATA_LENGTH);
+
+
+
+// const transform =
+//     ({xs, ys}) => {
+//       const values = [
+//         normalize(xs.vx0, VX0_MIN, VX0_MAX),
+//         normalize(xs.vy0, VY0_MIN, VY0_MAX),
+//         normalize(xs.vz0, VZ0_MIN, VZ0_MAX), normalize(xs.ax, AX_MIN, AX_MAX),
+//         normalize(xs.ay, AY_MIN, AY_MAX), normalize(xs.az, AZ_MIN, AZ_MAX),
+//         normalize(xs.start_speed, START_SPEED_MIN, START_SPEED_MAX),
+//         xs.left_handed_pitcher
+//       ];
+//       return {xs: values, ys: ys.pitch_code};
+//     }
+
+// const trainingData =
+//     tf.data.csv(TRAIN_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
+//         .map(csvTransform)
+//         .shuffle(TRAINING_DATA_LENGTH)
+//         .batch(100);
+
+// // Load all training data in one batch to use for evaluation
+// const trainingValidationData =
+//     tf.data.csv(TRAIN_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
+//         .map(csvTransform)
+//         .batch(TRAINING_DATA_LENGTH);
+
+// // Load all test data in one batch to use for evaluation
+// const testValidationData =
+//     tf.data.csv(TEST_DATA_PATH, {columnConfigs: {pitch_code: {isLabel: true}}})
+//         .map(csvTransform)
+//         .batch(TEST_DATA_LENGTH);
 
 const model = tf.sequential();
 model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));

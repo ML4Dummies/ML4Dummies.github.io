@@ -24,7 +24,7 @@ function displayHTMLTable(results){
 	// $("#parsed_csv_list").html(table);
 }
 
-function convertToMatrix(results){
+function load_dataset(results){
   var data = results.data;
   // console.log(data.length)
   var matrix=new Array();
@@ -34,8 +34,34 @@ function convertToMatrix(results){
     //console.log(cells)
     matrix.push(cells);
   }
-  console.log(matrix);
+  // data = tf.data.array(matrix)
+  //data.forEach(e => console.log(e));
+  data = preprocess(matrix)
+  //data.forEach(e => console.log(e));
+  //console.log(data);
 }
+
+function preprocess(data){
+    //Step 1. Shuffle the data
+    tf.util.shuffle(data)
+    
+    //Step 2. Separate data into inputs and labels an put into tensors
+    inputs = data.map(row => row.slice(0, -1));
+    labels = data.map(row => row.slice(-1));
+    const inputTensor = tf.tensor2d(inputs, [inputs.length, inputs[0].length]);
+    const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
+
+     //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
+     const inputMax = inputTensor.max();
+     const inputMin = inputTensor.min();  
+     const labelMax = labelTensor.max();
+     const labelMin = labelTensor.min();
+ 
+     const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+     const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
+
+}
+
 
 trainingFile.addEventListener("change", handleFiles, false);
 function handleFiles() {
@@ -45,7 +71,7 @@ function handleFiles() {
     config: {
       delimiter: ",",
       header:false, //Handled in the convertToMatrix
-      complete: convertToMatrix
+      complete: load_dataset
       //console.log//displayHTMLTable,
     },
     before: function(file, inputElem)
