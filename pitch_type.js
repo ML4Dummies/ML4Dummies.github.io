@@ -57,14 +57,14 @@ const TEST_DATA_LENGTH = 700;
 //         .map(csvTransform)
 //         .batch(TEST_DATA_LENGTH);
 
-const model = tf.sequential();
-model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
-model.add(tf.layers.dense({units: 175, activation: 'relu'}));
-model.add(tf.layers.dense({units: 150, activation: 'relu'}));
-model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
+// const model = tf.sequential();
+// model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
+// model.add(tf.layers.dense({units: 175, activation: 'relu'}));
+// model.add(tf.layers.dense({units: 150, activation: 'relu'}));
+// model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
 
-model.compile({
-  optimizer: tf.train.adam(),
-  loss: 'sparseCategoricalCrossentropy',
-  metrics: ['accuracy']
-});
+// model.compile({
+//   optimizer: tf.train.adam(),
+//   loss: 'sparseCategoricalCrossentropy',
+//   metrics: ['accuracy']
+// });

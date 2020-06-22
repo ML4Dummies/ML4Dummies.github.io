@@ -1,6 +1,7 @@
 console.log('Hello TensorFlow');
 
 const trainingFile = document.getElementById('fileuploadTrain');
+const testingFile = document.getElementById('fileuploadTest');
 
 function displayHTMLTable(results){
 	var table = "<table class='table'>";
@@ -25,7 +26,7 @@ function displayHTMLTable(results){
 }
 
 function load_dataset(results){
-  var data = results.data;
+  data = results.data;
   // console.log(data.length)
   var matrix=new Array();
   for(i=1;i<data.length-1;i++){
@@ -41,13 +42,15 @@ function load_dataset(results){
   //console.log(data);
 }
 
-function preprocess(data){
+function preprocess(array){
+
+  return tf.tidy(() => {
     //Step 1. Shuffle the data
-    tf.util.shuffle(data)
+    tf.util.shuffle(array)
     
     //Step 2. Separate data into inputs and labels an put into tensors
-    inputs = data.map(row => row.slice(0, -1));
-    labels = data.map(row => row.slice(-1));
+    inputs = array.map(row => row.slice(0, -1));
+    labels = array.map(row => row.slice(-1));
     const inputTensor = tf.tensor2d(inputs, [inputs.length, inputs[0].length]);
     const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
 
@@ -60,11 +63,90 @@ function preprocess(data){
      const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
      const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
 
+     return {
+      inputs: normalizedInputs,
+      labels: normalizedLabels,
+      // Return the min/max bounds so we can use them later.
+      inputMax,
+      inputMin,
+      labelMax,
+      labelMin,
+    }
+  });
 }
 
+function createModel() {
+  // Create a sequential model
+  const model = tf.sequential();
+  model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
+  model.add(tf.layers.dense({units: 175, activation: 'relu'}));
+  model.add(tf.layers.dense({units: 150, activation: 'relu'}));
+  model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
 
-trainingFile.addEventListener("change", handleFiles, false);
-function handleFiles() {
+  return model;
+}
+
+async function trainModel(){
+  console.log("Training...")
+  model=createModel();
+  model.compile({
+    optimizer: tf.train.adam(),
+    loss: 'sparseCategoricalCrossentropy',
+    metrics: ['accuracy']
+  });
+
+  const batchSize = 100;
+  const epochs = 10;
+  inputs=train_data['inputs']
+  labels=train_data['labels']
+  console.log( inputs )
+
+  return await model.fit(inputs, labels, {
+      batchSize,
+      epochs,
+      shuffle: true,
+      callbacks: tfvis.show.fitCallbacks(
+      { name: 'Training Performance' },
+      ['loss','mse'], 
+      { height: 200, callbacks: ['onEpochEnd'] }
+      )
+  });
+}
+
+function calcPitchClassEval(pitchIndex, classSize, values) {
+  // Output has 7 different class values for each pitch, offset based on
+  // which pitch class (ordered by i)
+  let index = (pitchIndex * classSize * NUM_PITCH_CLASSES) + pitchIndex;
+  let total = 0;
+  for (let i = 0; i < classSize; i++) {
+    total += values[index];
+    index += NUM_PITCH_CLASSES;
+  }
+  return total / classSize;
+}
+
+function testModel(){
+  console.log("Results")
+
+  inputs=test_data['inputs']
+  labels=test_data['labels']
+  let results=[];
+  tf.tidy(()=>{
+    const values = model.predict(inputs).dataSync();
+    const classSize = TEST_DATA_LENGTH / NUM_PITCH_CLASSES;
+    for (let i = 0; i < NUM_PITCH_CLASSES; i++) {
+      results.push(calcPitchClassEval(i, classSize, values))
+    }
+  });
+  
+  
+  console.log(results)
+}
+
+trainingFile.addEventListener("change", handleTrainFiles, false);
+testingFile.addEventListener("change", handleTestFiles, false)
+
+function handleTrainFiles() {
   const file = this.files; /* now you can work with the file list */
   
   $('#fileuploadTrain').parse({
@@ -84,11 +166,37 @@ function handleFiles() {
     },
     complete: function()
     {
+      train_data=data
       console.log("Done with all files");
     }
   });
   
-  console.log(trainingFile);
 }
+function handleTestFiles() {
+  const file = this.files; /* now you can work with the file list */
 
+$('#fileuploadTest').parse({
+  config: {
+    delimiter: ",",
+    header:false, //Handled in the convertToMatrix
+    complete: load_dataset
+    //console.log//displayHTMLTable,
+  },
+  before: function(file, inputElem)
+  {
+    //console.log("Parsing file...", file);
+  },
+  error: function(err, file)
+  {
+    //console.log("ERROR:", err, file);
+  },
+  complete: function()
+  {
+    console.log("Complete")
+    test_data=data
+    console.log("Done with all files");
+  }
+});
 
+}
+// module.exports = {trainModel}
