@@ -35,42 +35,50 @@ function load_dataset(results){
     //console.log(cells)
     matrix.push(cells);
   }
-  // data = tf.data.array(matrix)
-  //data.forEach(e => console.log(e));
+  
+  data = tf.data.array(matrix)
+  
   data = preprocess(matrix)
+  console.log("Inputs: ")
+  //data.inputs.forEachAsync(e => console.log(e));
+  //data.labels.forEachAsync(e => console.log(e));
   //data.forEach(e => console.log(e));
-  //console.log(data);
+
+  console.log(data.inputs.dataSync());
 }
 
 function preprocess(array){
 
   return tf.tidy(() => {
     //Step 1. Shuffle the data
-    tf.util.shuffle(array)
+    //tf.util.shuffle(array)
     
     //Step 2. Separate data into inputs and labels an put into tensors
     inputs = array.map(row => row.slice(0, -1));
     labels = array.map(row => row.slice(-1));
+    
+
     const inputTensor = tf.tensor2d(inputs, [inputs.length, inputs[0].length]);
     const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
 
+    //reduce_max TODO
+
      //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
-     const inputMax = inputTensor.max();
-     const inputMin = inputTensor.min();  
-     const labelMax = labelTensor.max();
-     const labelMin = labelTensor.min();
+     const inputMax = inputTensor.max(axis=0);
+     const inputMin = inputTensor.min(axis=0);  
+    //  const inputMin = tf.tensor1d([-18.885, -152.463, -15.5146078412997, -48.0287647107959, 9.397, -49.339, 59, 0])
+    //  const inputMax = tf.tensor1d([18.065, -86.374,  9.974, 30.592, 49.18, 2.95522851438373, 104.4, 1])
+    //  console.log(inputMax.dataSync())
+    //  console.log(inputMin.dataSync())
  
      const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
-     const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
 
      return {
       inputs: normalizedInputs,
-      labels: normalizedLabels,
+      labels: labelTensor,
       // Return the min/max bounds so we can use them later.
       inputMax,
-      inputMin,
-      labelMax,
-      labelMin,
+      inputMin
     }
   });
 }
