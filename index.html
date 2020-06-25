@@ -17,19 +17,51 @@
 </head>
 
 <body>
+    <p>Choose a machine learning algorithm: 
+    <input type="radio" id="classification" name="MLType" value="Classification">
+    <label for="classification">Classification</label>
+    <input type="radio" id="regression" name="MLType" value="Regression">
+    <label for="regression">Regression</label></p>
+    <hr>
+
+    <p>Upload training data here: 
+    <input id="fileuploadTrain" name="trainData" accept=".csv" type="file" /></p>
+    <p>Upload testing data here: 
+    <input id="fileuploadTest" name="testData" accept=".csv" type="file" /></p>
+    <hr>
+      <b>
+        Enter the range of columns containing the features and labels in your dataset
+      </b>
+    <form>
+      <p><label for="features">Features: </label>
+      <input type="text" id="features" name="features">
+      (1, 3-5 etc.)
+    </p>
     
-    <p>Upload Training Data Here</p>
-    <input id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
-    <p>Upload Testing Data Here</p>
-    <input id="fileuploadTest" name="testData" accept=".csv" type="file" />
+    <p>
+      <label for="labels">Label Column: </label>
+      <input type="text" id="labels" name="labels">
+      (1, 3-5 etc.)
+    </p>
+    <p><b>Optionally exclude rows in your dataset (e.g. headers)</b></p>
+      <label for="row-exclude">Rows to exclude: </label>
+      <input type="text" id="row-exclude" name="row-exclude">
+      (1, 3-5 etc.)
+
+    </form> 
+
+    <hr>
+    <button id="add-layer" onmousedown="addLayer()" >Add Layer</button>
+    </br>
+    <div id="layer-customize"></div>
+
+    <hr>
     
-</br>
-</br>
     <script src="index.js"></script>
     <script src="pitch_type.js"></script>
     <button id="train" onmousedown="trainModel()" >Train</button>
     <button id="predict" onmousedown="testModel()" >Predict</button>
-        
+    <hr>    
 
     <div id="console"></div>
     
