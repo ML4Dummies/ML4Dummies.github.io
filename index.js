@@ -68,8 +68,7 @@ function included_rows(num_rows, excludeRows){
      keepRows.push(i);
   }
   return keepRows
-}
-  
+}  
 
 function preprocess(array){
 
@@ -112,13 +111,27 @@ function preprocess(array){
 document.getElementById("preprocess").addEventListener("click", () => {preprocess(train_data)});
 
 
+
 function createModel() {
   // Create a sequential model
+  modelDict=parseLayers()
   const model = tf.sequential();
-  model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
-  model.add(tf.layers.dense({units: 175, activation: 'relu'}));
-  model.add(tf.layers.dense({units: 150, activation: 'relu'}));
-  model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
+  for(let key in modelDict){
+    let num = modelDict[key].value;
+    let activ = modelDict[key].activation;
+    if(key=='layer-1'){
+      model.add(tf.layers.dense({units: num, activation: activ, inputShape: [input_cols.length]}));
+    }
+    else{
+      model.add(tf.layers.dense({units: num, activation: activ}));
+    }
+  }
+  console.log(model.summary())
+  // const model = tf.sequential();
+  // model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
+  // model.add(tf.layers.dense({units: 175, activation: 'relu'}));
+  // model.add(tf.layers.dense({units: 150, activation: 'relu'}));
+  //model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
 
   return model;
 }

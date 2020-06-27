@@ -12,7 +12,7 @@
   <script src="PapaParse-5.0.2/papaparse.min.js"></script>
 
   <!-- Import the main script file -->
-  <script src="script.js"></script>
+  
 
 </head>
 
@@ -43,6 +43,9 @@
       <input type="text" id="labels" name="labels">
       (1, 3-5 etc.)
     </p>
+
+    <div id="num-classes-prompt"></div>
+
     <p><b>Optionally exclude rows in your dataset (e.g. headers)</b></p>
       <label for="row-exclude">Rows to exclude: </label>
       <input type="text" id="row-exclude" name="row-exclude">
@@ -57,9 +60,12 @@
     <button id="add-layer" onmousedown="addLayer()" type='button'>Add Layer</button>
     </br>
     <div id="layer-customize"></div>
+    <div id="classification-layer"></div>
 
-    <hr>
+    <button id="create-model" onmousedown="createModel()" type='button'>Create Model</button>
     
+    <hr>
+    <script src="script.js"></script>
     <script src="index.js"></script>
     <script src="pitch_type.js"></script>
     <button id="train" onmousedown="trainModel()" type='button'>Train</button>
