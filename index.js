@@ -35,33 +35,59 @@ function load_dataset(results){
     //console.log(cells)
     matrix.push(cells);
   }
-  
-  data = tf.data.array(matrix)
-  
-  data = preprocess(matrix)
-  console.log("Inputs: ")
-  //data.inputs.forEachAsync(e => console.log(e));
-  //data.labels.forEachAsync(e => console.log(e));
-  //data.forEach(e => console.log(e));
 
-  console.log(data.inputs.dataSync());
+  data = matrix
+  
 }
+
+function parse_text(id){
+  raw_text = document.getElementById(id).value
+  numbers = parse(raw_text)
+  return numbers
+}
+
+function parse(string) {
+  let numbers = [];
+  for (let match of string.split(",")) {
+      if (match.includes("-")) {
+          let [begin, end] = match.split("-");
+          for (let num = parseInt(begin); num <= parseInt(end); num++) {
+              numbers.push(num-1);
+          }
+      } else {
+          numbers.push(parseInt(match)-1);
+      }
+  }
+  return numbers;
+}
+
+function included_rows(num_rows, excludeRows){
+  let keepRows = []
+  for (let i=0; i<num_rows;i++){
+    if (excludeRows.indexOf(i)==-1)
+     keepRows.push(i);
+  }
+  return keepRows
+}
+  
 
 function preprocess(array){
 
+  input_cols = parse_text("features")
+  label_cols = parse_text("labels")
+  included_rows = included_rows(array.length, parse_text("row-exclude"))
+  
   return tf.tidy(() => {
     //Step 1. Shuffle the data
-    //tf.util.shuffle(array)
+    tf.util.shuffle(array)
     
     //Step 2. Separate data into inputs and labels an put into tensors
-    inputs = array.map(row => row.slice(0, -1));
-    labels = array.map(row => row.slice(-1));
+    data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_rows, axis = 0);
+
+    const inputTensor = data_matrix.gather(input_cols, axis = 1)
+    const labelTensor = data_matrix.gather(label_cols, axis = 1)
     
-
-    const inputTensor = tf.tensor2d(inputs, [inputs.length, inputs[0].length]);
-    const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
-
-    //reduce_max TODO
+    //exlude rows TODO
 
      //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
      const inputMax = inputTensor.max(axis=0);
@@ -82,6 +108,9 @@ function preprocess(array){
     }
   });
 }
+
+document.getElementById("preprocess").addEventListener("click", () => {preprocess(train_data)});
+
 
 function createModel() {
   // Create a sequential model
