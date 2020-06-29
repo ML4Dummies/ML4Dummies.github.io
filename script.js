@@ -77,14 +77,11 @@ var radioClassification=document.getElementById('classification');
 var radioRegression=document.getElementById('regression');
 
 radioClassification.onclick = function() {
-    var numClassesPrompt = document.getElementById("num-classes-prompt");
-    numClassesPrompt.appendChild(document.createTextNode("Enter number of classes:"));
-    var  numClasses = document.createElement("input");
-    numClasses.type = "text";
-    numClasses.name = "num-classes";
-    numClasses.id = "num-classes";
-    //input.setAttribute("id", "Div1");
-    numClassesPrompt.appendChild(numClasses);
+    document.getElementById("num-classes-prompt").style.display = "block";
+}
+
+radioRegression.onclick = function() {
+    document.getElementById("num-classes-prompt").style.display = "none";
 }
 
 
@@ -99,6 +96,7 @@ function parseLayers(){
     }
     key="classifier";
     layerVal = parseInt(document.getElementById("num-classes").value);
+    num_classes = layerVal;
     layerAct = 'softmax';//document.getElementById("").value;
     layersInfo[key] = {'value':layerVal, 'activation':layerAct};
 

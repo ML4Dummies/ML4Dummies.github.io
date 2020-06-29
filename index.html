@@ -18,7 +18,7 @@
 
 <body>
     <p>Choose a machine learning algorithm: 
-    <input type="radio" id="classification" name="MLType" value="Classification">
+    <input type="radio" id="classification" name="MLType" value="Classification" checked>
     <label for="classification">Classification</label>
     <input type="radio" id="regression" name="MLType" value="Regression">
     <label for="regression">Regression</label></p>
@@ -26,8 +26,8 @@
 
     <p>Upload training data here: 
     <input id="fileuploadTrain" name="trainData" accept=".csv" type="file" /></p>
-    <p>Upload testing data here: 
-    <input id="fileuploadTest" name="testData" accept=".csv" type="file" /></p>
+    <!-- <p>Upload testing data here: 
+    <input id="fileuploadTest" name="testData" accept=".csv" type="file" /></p> -->
     <hr>
       <b>
         Enter the range of columns containing the features and labels in your dataset
@@ -44,7 +44,13 @@
       (1, 3-5 etc.)
     </p>
 
-    <div id="num-classes-prompt"></div>
+    <div id="num-classes-prompt">
+      <p>
+        <label for="num-classes-prompt">Enter the number of classes: </label>
+        <input type="text" name="num-classes-prompt" id="num-classes">
+      </p>
+    </div>
+    
 
     <p><b>Optionally exclude rows in your dataset (e.g. headers)</b></p>
       <label for="row-exclude">Rows to exclude: </label>
@@ -69,7 +75,7 @@
     <script src="index.js"></script>
     <script src="pitch_type.js"></script>
     <button id="train" onmousedown="trainModel()" type='button'>Train</button>
-    <button id="predict" onmousedown="testModel()" type='button'>Predict</button>
+    <!-- <button id="predict" onmousedown="testModel()" type='button'>Predict</button> -->
     <hr>    
 
     <div id="console"></div>

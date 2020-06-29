@@ -1,4 +1,7 @@
-console.log('Hello TensorFlow');
+TRAIN_SPLIT = 0.9
+VAL_SPLIT = 0.1
+TEST_SPLIT = 0.1
+
 
 const trainingFile = document.getElementById('fileuploadTrain');
 const testingFile = document.getElementById('fileuploadTest');
@@ -85,31 +88,37 @@ function preprocess(array){
 
     const inputTensor = data_matrix.gather(input_cols, axis = 1)
     const labelTensor = data_matrix.gather(label_cols, axis = 1)
+    var datasetSize = inputTensor.shape[0]
+
+    var trainSize = parseInt(datasetSize*TRAIN_SPLIT)
+    var testSize = datasetSize - trainSize
+
+    var trainData = tf.slice(inputTensor, 0, trainSize)
+    var trainLabels = tf.slice(labelTensor, 0, trainSize)
+
+    var testData = tf.slice(inputTensor, trainSize, testSize)
+    var testLabels = tf.slice(labelTensor,  trainSize , testSize)
     
-    //exlude rows TODO
 
      //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
-     const inputMax = inputTensor.max(axis=0);
-     const inputMin = inputTensor.min(axis=0);  
+     const inputMax = trainData.max(axis=0);
+     const inputMin = trainData.min(axis=0);  
     //  const inputMin = tf.tensor1d([-18.885, -152.463, -15.5146078412997, -48.0287647107959, 9.397, -49.339, 59, 0])
     //  const inputMax = tf.tensor1d([18.065, -86.374,  9.974, 30.592, 49.18, 2.95522851438373, 104.4, 1])
     //  console.log(inputMax.dataSync())
     //  console.log(inputMin.dataSync())
  
-     const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+     const normalizedTrain = trainData.sub(inputMin).div(inputMax.sub(inputMin));
+     const normalizedTest = testData.sub(inputMin).div(inputMax.sub(inputMin));
 
-     return {
-      inputs: normalizedInputs,
-      labels: labelTensor,
-      // Return the min/max bounds so we can use them later.
-      inputMax,
-      inputMin
-    }
+     return [{inputs: normalizedTrain, labels: trainLabels, inputMax, inputMin},
+            {inputs: normalizedTest, labels: testLabels}]
   });
 }
 
-document.getElementById("preprocess").addEventListener("click", () => {preprocess(train_data)});
-
+document.getElementById("preprocess").addEventListener("click", () => {
+  [train_data, test_data] = preprocess(data)
+  });
 
 
 function createModel() {
@@ -126,7 +135,7 @@ function createModel() {
       model.add(tf.layers.dense({units: num, activation: activ}));
     }
   }
-  console.log(model.summary())
+  model.summary()
   // const model = tf.sequential();
   // model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
   // model.add(tf.layers.dense({units: 175, activation: 'relu'}));
@@ -146,55 +155,58 @@ async function trainModel(){
   });
 
   const batchSize = 100;
-  const epochs = 10;
+  const epochs = 50;
   inputs=train_data['inputs']
   labels=train_data['labels']
-  console.log( inputs )
+
+  console.log(inputs)
 
   return await model.fit(inputs, labels, {
       batchSize,
       epochs,
       shuffle: true,
+      validationSplit: VAL_SPLIT,
       callbacks: tfvis.show.fitCallbacks(
       { name: 'Training Performance' },
-      ['loss','mse'], 
+      ['loss', 'val_loss', 'acc', 'val_acc'], 
       { height: 200, callbacks: ['onEpochEnd'] }
       )
+      
   });
 }
 
-function calcPitchClassEval(pitchIndex, classSize, values) {
-  // Output has 7 different class values for each pitch, offset based on
-  // which pitch class (ordered by i)
-  let index = (pitchIndex * classSize * NUM_PITCH_CLASSES) + pitchIndex;
-  let total = 0;
-  for (let i = 0; i < classSize; i++) {
-    total += values[index];
-    index += NUM_PITCH_CLASSES;
-  }
-  return total / classSize;
-}
+// function calcPitchClassEval(pitchIndex, classSize, values) {
+//   // Output has 7 different class values for each pitch, offset based on
+//   // which pitch class (ordered by i)
+//   let index = (pitchIndex * classSize * num_classes) + pitchIndex;
+//   let total = 0;
+//   for (let i = 0; i < classSize; i++) {
+//     total += values[index];
+//     index += NUM_PITCH_CLASSES;
+//   }
+//   return total / classSize;
+// }
 
-function testModel(){
-  console.log("Results")
+// function testModel(){
+//   console.log("Results")
 
-  inputs=test_data['inputs']
-  labels=test_data['labels']
-  let results=[];
-  tf.tidy(()=>{
-    const values = model.predict(inputs).dataSync();
-    const classSize = TEST_DATA_LENGTH / NUM_PITCH_CLASSES;
-    for (let i = 0; i < NUM_PITCH_CLASSES; i++) {
-      results.push(calcPitchClassEval(i, classSize, values))
-    }
-  });
+//   inputs=test_data['inputs']
+//   labels=test_data['labels']
+//   let results=[];
+//   tf.tidy(()=>{
+//     const values = model.predict(inputs).dataSync();
+//     const classSize = TEST_DATA_LENGTH / num_classes;
+//     for (let i = 0; i < NUM_PITCH_CLASSES; i++) {
+//       results.push(calcPitchClassEval(i, classSize, values))
+//     }
+//   });
   
   
-  console.log(results)
-}
+//   console.log(results)
+// }
 
 trainingFile.addEventListener("change", handleTrainFiles, false);
-testingFile.addEventListener("change", handleTestFiles, false)
+//testingFile.addEventListener("change", handleTestFiles, false)
 
 function handleTrainFiles() {
   const file = this.files; /* now you can work with the file list */
@@ -216,37 +228,37 @@ function handleTrainFiles() {
     },
     complete: function()
     {
-      train_data=data
-      console.log("Done with all files");
+      // train_data=data
+      // console.log("Done with all files");
     }
   });
   
 }
-function handleTestFiles() {
-  const file = this.files; /* now you can work with the file list */
+// function handleTestFiles() {
+//   const file = this.files; /* now you can work with the file list */
 
-$('#fileuploadTest').parse({
-  config: {
-    delimiter: ",",
-    header:false, //Handled in the convertToMatrix
-    complete: load_dataset
-    //console.log//displayHTMLTable,
-  },
-  before: function(file, inputElem)
-  {
-    //console.log("Parsing file...", file);
-  },
-  error: function(err, file)
-  {
-    //console.log("ERROR:", err, file);
-  },
-  complete: function()
-  {
-    console.log("Complete")
-    test_data=data
-    console.log("Done with all files");
-  }
-});
+// $('#fileuploadTest').parse({
+//   config: {
+//     delimiter: ",",
+//     header:false, //Handled in the convertToMatrix
+//     complete: load_dataset
+//     //console.log//displayHTMLTable,
+//   },
+//   before: function(file, inputElem)
+//   {
+//     //console.log("Parsing file...", file);
+//   },
+//   error: function(err, file)
+//   {
+//     //console.log("ERROR:", err, file);
+//   },
+//   complete: function()
+//   {
+//     console.log("Complete")
+//     test_data=data
+//     console.log("Done with all files");
+//   }
+// });
 
-}
+// }
 // module.exports = {trainModel}
