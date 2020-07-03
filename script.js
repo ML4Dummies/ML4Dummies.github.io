@@ -23,6 +23,7 @@
 //      countLayer += 1;
 // }
 var countLayer=0;
+mode='Classification'
 
 function addLayer(){
     countLayer+=1;
@@ -57,6 +58,11 @@ function addLayer(){
     relu.text="ReLu";
     activation.add(relu);
     
+    var sigmoid=document.createElement("option");
+    sigmoid.value="sigmoid";
+    sigmoid.text="Sigmoid";
+    activation.add(sigmoid);
+
     var softmax=document.createElement("option");
     softmax.value="softmax";
     softmax.text="Softmax";
@@ -66,6 +72,11 @@ function addLayer(){
     tanh.value="tanh"
     tanh.text="Tanh"
     activation.add(tanh);
+        
+    var linear = document.createElement("option");
+    linear.value='linear'
+    linear.text="Linear"
+    activation.add(linear);
         
     container.appendChild(activation);
     // Append a line break 
@@ -78,27 +89,38 @@ var radioRegression=document.getElementById('regression');
 
 radioClassification.onclick = function() {
     document.getElementById("num-classes-prompt").style.display = "block";
+    mode='Classification'
 }
 
 radioRegression.onclick = function() {
     document.getElementById("num-classes-prompt").style.display = "none";
+    mode='Regression'
 }
 
 
 function parseLayers(){
-    layersInfo={}
+    var layersInfo={}
     for(let i = 1; i<=countLayer; i++){
-        console.log(i)
-        key="layer-"+i;
-        layerVal = parseInt(document.getElementById("layer-"+i).value);
-        layerAct = document.getElementById("activ-"+i).value;
+        var key="layer-"+i;
+        var layerVal = parseInt(document.getElementById("layer-"+i).value);
+        var layerAct = document.getElementById("activ-"+i).value;
         layersInfo[key] = {'value':layerVal, 'activation':layerAct};
     }
-    key="classifier";
-    layerVal = parseInt(document.getElementById("num-classes").value);
-    num_classes = layerVal;
-    layerAct = 'softmax';//document.getElementById("").value;
-    layersInfo[key] = {'value':layerVal, 'activation':layerAct};
+
+    var key="final";
+    if (mode==='Classification'){
+        
+        var layerVal = parseInt(document.getElementById("num-classes").value);
+        // var num_classes = layerVal;
+        var layerAct = 'softmax';//document.getElementById("").value;
+        layersInfo[key] = {'value':layerVal, 'activation':layerAct};
+    }
+    else{
+        // var labelCols=getLabelCols()
+        var layerVal = label_cols.length;
+        // var num_classes = layerVal;
+        layersInfo[key] = {'value':layerVal, 'activation':'linear'};
+    }
 
     return layersInfo
 }

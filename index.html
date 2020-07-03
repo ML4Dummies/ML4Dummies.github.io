@@ -4,12 +4,15 @@
   <title>TensorFlow.js Tutorial</title>
 
   <!-- Import TensorFlow.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.0.0/dist/tf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@2.0.1/dist/tf.min.js"></script>
   <!-- Import tfjs-vis -->
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.2/math.js"></script>
+  
+  
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-  <script src="PapaParse-5.0.2/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js"></script>
 
   <!-- Import the main script file -->
   
@@ -75,10 +78,12 @@
     <script src="index.js"></script>
     <script src="pitch_type.js"></script>
     <button id="train" onmousedown="trainModel()" type='button'>Train</button>
-    <!-- <button id="predict" onmousedown="testModel()" type='button'>Predict</button> -->
+    </br>
+    <button id="test" onmousedown="testModel()" type='button'>Test</button>
+    <div id="console"></div>
     <hr>    
 
-    <div id="console"></div>
+    
     
 </body>
 </html>
