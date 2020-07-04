@@ -173,95 +173,81 @@ function createModel() {
 async function trainModel(){
   console.log("Training...")
   // model=createModel();
+  if(mode=="Regression"){
+    var loss_ =  tf.losses.meanSquaredError;
+    var metrics_ = ['mse'];
+    var tfvis_metrics = ['loss', "val_loss"];
+  } else{
+    var loss_ =   'sparseCategoricalCrossentropy';
+    var metrics_ = ['accuracy'];
+    var tfvis_metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
+  }
 
-  if(mode==='Regression'){
-    console.log(mode)
-    model.compile({
-      optimizer: tf.train.adam(),
-      loss: tf.losses.meanSquaredError,
-      metrics: ['mse'],
-    });
-  }
-  else{
-    console.log(mode)
-    model.compile({
-      optimizer: tf.train.adam(),
-      loss: 'sparseCategoricalCrossentropy',
-      metrics: ['accuracy']
-    });
-  }
+  model.compile({
+    optimizer: tf.train.adam(),
+    loss: loss_,
+    metrics: metrics_,
+  });
 
   const batchSize = 32;
   const epochs = 100;
-  inputs=train_data['inputs']
-  labels=train_data['labels']
-
-  // inputs=tf.tensor2d([1,2,3,4,5],[5,1])
-  // labels=tf.tensor2d([2,4,6,8,10],[5,1])
-
-  inputs.print()
-  labels.print()
-  console.log(inputs.shape)
-  console.log(labels.shape)
+  var inputs=train_data['inputs']
+  var labels=train_data['labels']
 
   return await model.fit(inputs, labels, {
       batchSize,
       epochs,
       shuffle: true,
-      //validationSplit: VAL_SPLIT,
-      callbacks: tfvis.show.fitCallbacks(
-      { name: 'Training Performance' },
-      ['loss', 'mse'], 
-      { height: 200, callbacks: ['onEpochEnd'] }
-      )
+      validationSplit: VAL_SPLIT,
+      callbacks: [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
+                  {onEpochEnd: testCallback}]
+ 
   });
+
+  function testCallback(){
+    
+  }
+
+
+  return await model.fit(inputs, labels, {
+    batchSize,
+    epochs,
+    shuffle: true,
+    //validationSplit: VAL_SPLIT,
+    callbacks: {
+      onEpochEnd: (epoch, logs) => {
+        const values = model.predict(inputs);
+        console.log("Our loss: ", tf.losses.meanSquaredError(labels.squeeze(), values.squeeze()).dataSync());
+        console.log("Actual loss: ", logs.loss)
+      }
+    }
+});
+
 }
 
 function testModel(){
 
-  inputs=test_data['inputs']
-  labels=test_data['labels'].squeeze()
-  let results=[];
+  var inputs=test_data['inputs']
+  var labels=test_data['labels'].squeeze()
+  var results=[];
   
   tf.tidy(()=>{
     const values = model.predict(inputs);
-    pred=values.argMax(axis=1);
-    result=pred.equal(labels);
-    accuracy=result.sum().dataSync()[0]/result.shape[0];
-    console.log("Accuracy:")
-    document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
+
+    if (mode == "Classification"){
+      var pred=values.argMax(axis=1);
+      var result=pred.equal(labels);
+      var accuracy=result.sum().dataSync()[0]/result.shape[0];
+      document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
+    } else if (mode == "Regression"){
+      var error = tf.losses.meanSquaredError(labels, values.squeeze())
+      document.getElementById("console").appendChild(document.createTextNode("Error: "+ error.dataSync().toString()));
+    }
+    
   });
+
 }
 
-// function calcPitchClassEval(pitchIndex, classSize, values) {
-//   // Output has 7 different class values for each pitch, offset based on
-//   // which pitch class (ordered by i)
-//   let index = (pitchIndex * classSize * num_classes) + pitchIndex;
-//   let total = 0;
-//   for (let i = 0; i < classSize; i++) {
-//     total += values[index];
-//     index += NUM_PITCH_CLASSES;
-//   }
-//   return total / classSize;
-// }
-
-// function testModel(){
-//   console.log("Results")
-
-//   inputs=test_data['inputs']
-//   labels=test_data['labels']
-//   let results=[];
-//   tf.tidy(()=>{
-//     const values = model.predict(inputs).dataSync();
-//     const classSize = TEST_DATA_LENGTH / num_classes;
-//     for (let i = 0; i < NUM_PITCH_CLASSES; i++) {
-//       results.push(calcPitchClassEval(i, classSize, values))
-//     }
-//   });
-  
-  
-//   console.log(results)
-// }
 
 trainingFile.addEventListener("change", handleTrainFiles, false);
 //testingFile.addEventListener("change", handleTestFiles, false)
