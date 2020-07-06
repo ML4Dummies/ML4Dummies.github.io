@@ -1,8 +1,9 @@
 TRAIN_SPLIT = 0.9
 VAL_SPLIT = 0.1
 TEST_SPLIT = 0.1
+NUM_PAGES = 5
 
-
+var curr_page = 1;
 const trainingFile = document.getElementById('fileuploadTrain');
 const testingFile = document.getElementById('fileuploadTest');
 
@@ -306,3 +307,28 @@ function handleTrainFiles() {
 
 // }
 // module.exports = {trainModel}
+
+function show(shown, hidden) {
+  document.getElementById(shown).style.display='block';
+  document.getElementById(hidden).style.display='none';
+}
+
+function next_page(){
+  if(curr_page < NUM_PAGES){
+    curr_page++
+    document.getElementById("Page"+String(curr_page)).style.display='block';
+    document.getElementById("Page"+String(curr_page - 1)).style.display='none';
+  }
+  if(curr_page != 1) document.getElementById("back").style.display='inline';
+  if (curr_page == NUM_PAGES) document.getElementById("next").style.display='none';
+}
+
+function prev_page(){
+  if(curr_page > 1){
+    curr_page--
+    document.getElementById("Page"+String(curr_page)).style.display='block';
+    document.getElementById("Page"+String(curr_page + 1)).style.display='none';
+  }
+  if(curr_page == 1) document.getElementById("back").style.display='none';
+  if (curr_page != NUM_PAGES) document.getElementById("next").style.display='inline';
+}
