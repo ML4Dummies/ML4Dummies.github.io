@@ -316,7 +316,7 @@ function show(shown, hidden) {
 function next_page(){
   if(curr_page < NUM_PAGES){
     curr_page++
-    document.getElementById("Page"+String(curr_page)).style.display='block';
+    document.getElementById("Page"+String(curr_page)).style.display='flex';
     document.getElementById("Page"+String(curr_page - 1)).style.display='none';
   }
   if(curr_page != 1) document.getElementById("back").style.display='inline';
@@ -326,7 +326,7 @@ function next_page(){
 function prev_page(){
   if(curr_page > 1){
     curr_page--
-    document.getElementById("Page"+String(curr_page)).style.display='block';
+    document.getElementById("Page"+String(curr_page)).style.display='flex';
     document.getElementById("Page"+String(curr_page + 1)).style.display='none';
   }
   if(curr_page == 1) document.getElementById("back").style.display='none';
