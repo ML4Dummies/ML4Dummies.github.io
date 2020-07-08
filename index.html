@@ -85,10 +85,24 @@
 
         <div id="Page3" class="col card text-center h-100" style="display:none">
           <div class="my-auto">
-            <button id="add-layer" onmousedown="addLayer()" type='button'>Add Layer</button>
-            </br>
-            <div id="layer-customize"></div>
-            <div id="classification-layer"></div>
+            <div id="layer-customize">
+              <table class="table" id="model-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Layer</th>
+                    <th scope="col">Number of nodes</th>
+                    <th scope="col">Activation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+              
+            </div>
+            <div id="classification-layer">
+            </div>
+            <br>
+            <button id="add-layer" type='button'>Add Layer</button>
             <button id="create-model" onmousedown="createModel()" type='button'>Create Model</button>
           </div>
         </div>

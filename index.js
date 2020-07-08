@@ -142,7 +142,11 @@ function preprocess(array){
 
 document.getElementById("preprocess").addEventListener("click", () => {
   [train_data, test_data] = preprocess(data)
+  addLayer(1, "Final") 
+
   });
+
+
 
 
 function createModel() {

@@ -1,33 +1,32 @@
 var countLayer=0;
 mode='Classification'
 
-function addLayer(){
-    countLayer+=1;
+function addLayer(layer_pos, name){
+    //countLayer+=1;
     // Number of inputs to create
     //var number = 0;//document.getElementById("member").value;
     // Container <div> where dynamic content will be placed
-    var container = document.getElementById("layer-customize");
-    // Append a node with a random text
-    container.appendChild(document.createTextNode("Layer "+ countLayer));
-    container.appendChild(document.createElement("br"));
-    container.appendChild(document.createTextNode("Number of Neurons: " ));
-    // Create an <input> element, set its type and name attributes
+    // var container = document.getElementById("layer-customize");
+    console.log(name)
+    var table = document.getElementById("model-table");
+    var row = table.insertRow(layer_pos);
+    var layer_num = row.insertCell(0);
+    var num_neurons = row.insertCell(1);
+    var activ = row.insertCell(2);
+
+    layer_num.appendChild(document.createTextNode(name));
+
     var neuronNum = document.createElement("input");
     neuronNum.type = "text";
-    neuronNum.name = "layer-" + countLayer;
-    neuronNum.id = "layer-" + countLayer;
-    console.log(neuronNum.id)
-    //input.setAttribute("id", "Div1");
-    container.appendChild(neuronNum);
+    neuronNum.name = "layer-" + name;
+    neuronNum.id = "layer-" + name;
+    num_neurons.appendChild(neuronNum)
 
-    //container.appendChild(document.createElement("br"));
-    //container.appendChild(document.createElement("pre"));
 
-    container.appendChild(document.createTextNode("    Activation Type:"));
     var activation = document.createElement("select");
     activation.type = "text";
-    activation.name = "activ-" + countLayer;
-    activation.id = "activ-" + countLayer;
+    activation.name = "activ-" + name;
+    activation.id = "activ-" + name;
     
     var relu=document.createElement("option");
     relu.value="relu";
@@ -53,12 +52,16 @@ function addLayer(){
     linear.value='linear'
     linear.text="Linear"
     activation.add(linear);
-        
-    container.appendChild(activation);
-    // Append a line break 
-    container.appendChild(document.createElement("br"));
+
+    activ.appendChild(activation)
+
    
 }
+
+document.getElementById("add-layer").addEventListener("click", () => {
+    countLayer+=1;
+    addLayer(countLayer, countLayer);
+});
 
 var radioClassification=document.getElementById('classification');
 var radioRegression=document.getElementById('regression');
