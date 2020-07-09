@@ -24,7 +24,7 @@
 
 </head>
 
-<body>
+<body style="background-color:LightGray;">
   <!-- <div class="row vh-100"> -->
 
   <div class="container page-font">
@@ -84,9 +84,10 @@
         </div>
 
         <div id="Page3" class="col card text-center h-100" style="display:none">
-          <div class="my-auto">
-            <div id="layer-customize">
-              <table class="table" id="model-table">
+          <div class="mt-5">
+            <!-- <h4> Create the model </h4> -->
+            <div id="layer-customize" class="table-responsive">
+              <table class="table table-hover" id="model-table">
                 <thead>
                   <tr>
                     <th scope="col">Layer</th>
@@ -102,19 +103,50 @@
             <div id="classification-layer">
             </div>
             <br>
-            <button id="add-layer" type='button'>Add Layer</button>
-            <button id="create-model" onmousedown="createModel()" type='button'>Create Model</button>
+            <button class="btn btn-light" id="add-layer" type='button'>Add Layer</button>
+            <button class="btn btn-info" id="create-model" onmousedown="createModel()" type='button'>Create Model</button>
           </div>
         </div>
 
-        <div id="Page4" class="col card text-center h-100" style="display:none">
+        <div id="Page4" class="col card h-100" style="display:none">
+          <div class="my-auto">
+            <div class="form-group">
+              <p><label for="epochs">Number of epochs</label>
+                <input type="text" class="form-control" id="epochs" name="epochs" class="w-50">
+              </p>
+              </br>
+              <p>
+                <label for="batch-size"> Batch Size </label>
+                <input type="text" class="form-control" id="batch-size" name="batch-size">
+              </p>
+              </br>
+              <p><label for="loss">Loss</label>
+                <div id="loss"> </div>
+              </p>
+
+              <p><label for="optimizer">Optimizer</label>
+                <div id="optimizer"> </div>
+              </p>
+
+              <p><label for="shuffle">Shuffle</label>
+                <input type="checkbox" id="shuffle" value="True" checked> 
+              </p>
+
+            </div>
+
+            
+            <button id="save-option" onmousedown="" type='button'>Save Options</button>
+          </div>
+        </div>
+
+        <div id="Page5" class="col card text-center h-100" style="display:none">
           <div class="my-auto">
             <button id="train" onmousedown="trainModel()" type='button'>Train</button>
           </div>
         </div>
 
 
-        <div id="Page5" class="col card text-center h-100" style="display:none">
+        <div id="Page6" class="col card text-center h-100" style="display:none">
           <div class="my-auto">
             <button id="test" onmousedown="testModel()" type='button'>Test</button>
             <div id="console"></div>

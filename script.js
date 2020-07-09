@@ -103,3 +103,53 @@ function parseLayers(){
 
     return layersInfo
 }
+
+trainOptionsDropdown();
+
+function trainOptionsDropdown(){
+
+    var lossDiv = document.getElementById("loss")
+    var lossSelect = document.createElement("select");
+   
+    lossList=[
+        [tf.losses.absoluteDifference, "absoluteDifference"],
+        [tf.losses.computeWeightedLoss, "computeWeightedLoss"],
+        [tf.losses.cosineDistance, "cosineDistance"],
+        [tf.losses.hingeLoss, "hingeLoss"],
+        [tf.losses.huberLoss, "huberLoss"],
+        [tf.losses.logLoss, "logLoss"],
+        [tf.losses.meanSquaredError,"meanSquaredError"],
+        [tf.losses.sigmoidCrossEntropy, "sigmoidCrossEntropy"],
+        [tf.losses.softmaxCrossEntropy, "softmaxCrossEntropy"]]
+    
+    for(loss of lossList){
+        var lossVar = document.createElement("option");
+        lossVar.value=loss[0]
+        lossVar.text=loss[1]
+        lossSelect.add(lossVar)
+    }
+
+    lossDiv.appendChild(lossSelect)
+
+    var optimDiv = document.getElementById("optimizer")
+    var optimSelect = document.createElement("select");
+    
+    optimList=[
+        [tf.train.sgd,"sgd"],
+        [tf.train.momentum,"momentum"],
+        [tf.train.adagrad,"adagrad"],
+        [tf.train.adadelta,"adadelta"],
+        [tf.train.adam,"adam"],
+        [tf.train.adamax,"adamax"],
+        [tf.train.rmsprop,"rmsprop"]]
+
+    for(optim of optimList){
+        var optimVar = document.createElement("option");
+        optimVar.value=optim[0]
+        optimVar.text=optim[1]
+        optimSelect.add(optimVar)
+    }
+
+    optimDiv.appendChild(optimSelect)
+}
+
