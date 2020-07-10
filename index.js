@@ -3,6 +3,7 @@ VAL_SPLIT = 0.1
 TEST_SPLIT = 0.1
 NUM_PAGES = 6
 
+
 var curr_page = 1;
 const trainingFile = document.getElementById('fileuploadTrain');
 const testingFile = document.getElementById('fileuploadTest');
@@ -86,9 +87,14 @@ function preprocess(array){
 
     //Step 2. Separate data into inputs and labels an put into tensors
     data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row, axis = 0);
-    const inputTensor = data_matrix.gather(input_cols, axis = 1)
-    const labelTensor = data_matrix.gather(label_cols, axis = 1)
-   
+    var inputTensor = data_matrix.gather(input_cols, axis = 1)
+    var labelTensor = data_matrix.gather(label_cols, axis = 1)
+    
+    if(mode=='Classification'){
+      var num_classes = parseInt(document.getElementById("num-classes").value);
+      labelTensor=tf.oneHot(labelTensor.squeeze().asType('int32'),num_classes)
+      console.log(labelTensor.shape)
+    }
     // exclusion_list = new Array()
     // for (let i=0; i<inputTensor.shape[0];i++){
     //   for (let j=0; j<inputTensor.shape[1];j++){
@@ -175,59 +181,77 @@ function createModel() {
   // return model;
 }
 
+function get_train_options(){
+  options=["loss","optimizer","epochs","batch-size","shuffle"]
+  dict={}
+  
+  for(option of options){
+    var optionDiv = document.getElementById(option);
+    if(option==='shuffle'){
+      dict[option] = optionDiv.checked;
+    }
+    else{
+      dict[option] = optionDiv.value;
+      console.log(optionDiv.value);
+    }
+  }
+  console.log(dict)
+ return dict
+}
+
 async function trainModel(){
+  options_dict=get_train_options()
+  
   console.log("Training...")
   // model=createModel();
   if(mode=="Regression"){
-    var loss_ =  tf.losses.meanSquaredError;
+    var loss_ =  eval(options_dict['loss']);
     var metrics_ = ['mse'];
     var tfvis_metrics = ['loss', "val_loss"];
   } else{
-    var loss_ =   'sparseCategoricalCrossentropy';
+    var loss_ =  eval(options_dict['loss']);
     var metrics_ = ['accuracy'];
     var tfvis_metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
   }
 
   model.compile({
-    optimizer: tf.train.adam(),
+    optimizer: eval(options_dict['optimizer']),
     loss: loss_,
     metrics: metrics_,
   });
 
-  const batchSize = 32;
-  const epochs = 100;
+  const batchSize = Number(options_dict['batch-size']);
+  const epochs = Number(options_dict['epochs']);
   var inputs=train_data['inputs']
   var labels=train_data['labels']
 
   return await model.fit(inputs, labels, {
       batchSize,
       epochs,
-      shuffle: true,
+      shuffle: options_dict['shuffle'],
       validationSplit: VAL_SPLIT,
       callbacks: [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
                   {onEpochEnd: testCallback}]
  
   });
 
-  function testCallback(){
-    
-  }
+  // return await model.fit(inputs, labels, {
+  //   batchSize,
+  //   epochs,
+  //   shuffle: true,
+  //   //validationSplit: VAL_SPLIT,
+  //   callbacks: {
+  //     onEpochEnd: (epoch, logs) => {
+  //       const values = model.predict(inputs);
+  //       console.log("Our loss: ", tf.losses.meanSquaredError(labels.squeeze(), values.squeeze()).dataSync());
+  //       console.log("Actual loss: ", logs.loss)
+  //     }
+  //   }
+// });
 
+}
 
-  return await model.fit(inputs, labels, {
-    batchSize,
-    epochs,
-    shuffle: true,
-    //validationSplit: VAL_SPLIT,
-    callbacks: {
-      onEpochEnd: (epoch, logs) => {
-        const values = model.predict(inputs);
-        console.log("Our loss: ", tf.losses.meanSquaredError(labels.squeeze(), values.squeeze()).dataSync());
-        console.log("Actual loss: ", logs.loss)
-      }
-    }
-});
-
+function testCallback(){
 }
 
 function testModel(){
@@ -241,7 +265,7 @@ function testModel(){
 
     if (mode == "Classification"){
       var pred=values.argMax(axis=1);
-      var result=pred.equal(labels);
+      var result=pred.equal(labels.argMax(axis=1));
       var accuracy=result.sum().dataSync()[0]/result.shape[0];
       document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
     } else if (mode == "Regression"){
