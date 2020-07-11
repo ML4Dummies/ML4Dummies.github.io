@@ -24,7 +24,7 @@
 
 </head>
 
-<body style="background-color:LightGray;">
+<body onload="start()" style="background-color:LightGray;">
   <!-- <div class="row vh-100"> -->
 
   <div class="container page-font">
@@ -39,7 +39,7 @@
             <input type="radio" id="regression" name="MLType" value="Regression">
             <label for="regression">Regression</label>
           </div>
-
+          <button id="autofill" onmousedown="autofill();" type='button'>Autofill</button>
         </div>
 
 
@@ -116,7 +116,7 @@
               </p>
               </br>
               <p>
-                <label for="batch-size"> Batch Size </label>
+                <label for="batch-size"> Batch size </label>
                 <input type="text" class="form-control" id="batch-size" name="batch-size">
               </p>
               </br>
@@ -128,6 +128,10 @@
                 <div id="optimizerDropdown"> </div>
               </p>
 
+              <p><label for="learning-rate">Learning rate</label>
+                <input type="text" class="form-control" id="learning-rate" name="learning-rate" class="w-50">
+              </p>
+
               <p><label for="shuffle">Shuffle</label>
                 <input type="checkbox" id="shuffle" value=true checked> 
               </p>
@@ -135,7 +139,7 @@
             </div>
 
             
-            <button id="save-option" onmousedown="" type='button'>Save Options</button>
+            <!-- <button id="save-option" onmousedown="" type='button'>Save Options</button> -->
           </div>
         </div>
 

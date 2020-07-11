@@ -1,5 +1,27 @@
 var countLayer=0;
 mode='Classification'
+optimList=[
+    [tf.train.adam,"Adam"],
+    [tf.train.sgd,"Stochastic Gradient Descent"],
+    // ['tf.train.momentum()',"Momentum"],
+    [tf.train.adagrad,"Adagrad"],
+    [tf.train.adadelta,"Adadelta"],
+    [tf.train.adamax,"Adamax"],
+    [tf.train.rmsprop,"RMSprop"]]
+
+lossClassificationList = [
+    [tf.losses.softmaxCrossEntropy, "Softmax Cross Entropy"],
+    [tf.losses.sigmoidCrossEntropy, "Sigmoid Cross Entropy"]];
+
+lossRegressionList= [
+    [tf.losses.meanSquaredError,"Mean Squared Error"],
+    [tf.losses.absoluteDifference, "Absolute Difference"],
+    [tf.losses.computeWeightedLoss, "Compute Weighted Loss"],
+    [tf.losses.cosineDistance, "Cosine Distance"],
+    [tf.losses.hingeLoss, "Hinge Loss"],
+    [tf.losses.huberLoss, "Huber Loss"],
+    [tf.losses.logLoss, "Log Loss"]];
+
 
 function addLayer(layer_pos, name){
     //countLayer+=1;
@@ -7,7 +29,6 @@ function addLayer(layer_pos, name){
     //var number = 0;//document.getElementById("member").value;
     // Container <div> where dynamic content will be placed
     // var container = document.getElementById("layer-customize");
-    console.log(name)
     var table = document.getElementById("model-table");
     var row = table.insertRow(layer_pos);
     var layer_num = row.insertCell(0);
@@ -68,12 +89,12 @@ var radioRegression=document.getElementById('regression');
 
 radioClassification.onclick = function() {
     document.getElementById("num-classes-prompt").style.display = "block";
-    mode='Classification'
+    mode='Classification';
 }
 
 radioRegression.onclick = function() {
     document.getElementById("num-classes-prompt").style.display = "none";
-    mode='Regression'
+    mode='Regression';
 }
 
 
@@ -104,56 +125,94 @@ function parseLayers(){
     return layersInfo
 }
 
-trainOptionsDropdown();
-console.log(tf.losses.sigmoidCrossEntropy)
-function trainOptionsDropdown(){
-    console.log(tf.train.adam)
-    var lossDiv = document.getElementById("lossDropdown")
+
+function lossOptions(){
+    var lossDiv = document.getElementById("lossDropdown");
+    lossDiv.removeChild(lossDiv.firstChild);
     var lossSelect = document.createElement("select");
     lossSelect.id = "loss";
-   
-    lossList=[
-        ['tf.losses.absoluteDifference', "Absolute Difference", true],
-        ['tf.losses.computeWeightedLoss', "Compute Weighted Loss"],
-        ['tf.losses.cosineDistance', "Cosine Distance"],
-        ['tf.losses.hingeLoss', "Hinge Loss"],
-        ['tf.losses.huberLoss', "Huber Loss"],
-        ['tf.losses.logLoss', "Log Loss"],
-        ['tf.losses.meanSquaredError',"Mean Squared Error"],
-        ['tf.losses.sigmoidCrossEntropy', "Sigmoid Cross Entropy"],
-        ['tf.losses.softmaxCrossEntropy', "Softmax Cross Entropy"],
-        //Losses from Keras API
-        ['sparseCategoricalCrossentropy',"Sparse Categorical Cross Entropy"]]
-    
-    for(loss of lossList){
+                           
+    lossList = mode == "Classification" ? lossClassificationList : lossRegressionList;
+
+    for(let i = 0; i < lossList.length; i++){
         var lossVar = document.createElement("option");
-        lossVar.value=loss[0]
-        lossVar.text=loss[1]
+        lossVar.value=i
+        lossVar.text=lossList[i][1]
         lossSelect.add(lossVar)
     }
 
     lossDiv.appendChild(lossSelect)
+}
 
-    var optimDiv = document.getElementById("optimizerDropdown")
+function optimOptions(){
+   
+    var optimDiv = document.getElementById("optimizerDropdown");
     var optimSelect = document.createElement("select");
     optimSelect.id = "optimizer";
 
-    optimList=[
-        ['tf.train.sgd()',"Stochastic Gradient Descent"],
-        ['tf.train.momentum()',"Momentum"],
-        ['tf.train.adagrad()',"Adagrad"],
-        ['tf.train.adadelta()',"Adadelta"],
-        ['tf.train.adam()',"Adam"],
-        ['tf.train.adamax()',"Adamax"],
-        ['tf.train.rmsprop()',"RMSprop"]]
+    // var optimList=[
+    //     [tf.train.sgd,"Stochastic Gradient Descent"],
+    //     // ['tf.train.momentum()',"Momentum"],
+    //     [tf.train.adagrad,"Adagrad"],
+    //     [tf.train.adadelta,"Adadelta"],
+    //     [tf.train.adam,"Adam"],
+    //     [tf.train.adamax,"Adamax"],
+    //     [tf.train.rmsprop,"RMSprop"]]
 
-    for(optim of optimList){
+    
+
+    for(let i = 0; i < optimList.length; i++){
         var optimVar = document.createElement("option");
-        optimVar.value=optim[0]
-        optimVar.text=optim[1]
+        optimVar.value=i;
+        optimVar.text=optimList[i][1]
         optimSelect.add(optimVar)
     }
 
     optimDiv.appendChild(optimSelect)
+}
+
+function start(){
+    lossOptions();
+    optimOptions();
+}
+
+function autofill(){
+    
+
+    if (mode == "Classification"){
+        fields_dict = {"features":"1-8", "labels":9,"num-classes":7, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
+        for (var field in fields_dict){
+            document.getElementById(field).value = fields_dict[field];
+        }
+        addLayer(1, 1);
+        addLayer(2, 2);
+        addLayer(3, 3);
+        addLayer(4, "final");
+        document.getElementById("layer-1").value = 250;
+        document.getElementById("layer-2").value = 175;
+        document.getElementById("layer-3").value = 150;
+        document.getElementById("layer-final").value = 7;
+        document.getElementById("activ-1").value = "relu";
+        document.getElementById("activ-2").value = "relu";
+        document.getElementById("activ-3").value = "relu";
+        document.getElementById("activ-final").value = "linear";
+        countLayer=4;
+    }else{
+        fields_dict = {"features":5, "labels":2, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
+        for (var field in fields_dict){
+            document.getElementById(field).value = fields_dict[field];
+        }
+        addLayer(1, 1);
+        addLayer(2, 2);
+        addLayer(3, "final");
+        document.getElementById("layer-1").value = 100;
+        document.getElementById("layer-2").value = 100;
+        document.getElementById("layer-final").value = 1;
+        document.getElementById("activ-1").value = "sigmoid";
+        document.getElementById("activ-2").value = "sigmoid";
+        document.getElementById("activ-final").value = "linear";
+        countLayer=3;
+    }
+    
 }
 

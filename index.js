@@ -93,7 +93,6 @@ function preprocess(array){
     if(mode=='Classification'){
       var num_classes = parseInt(document.getElementById("num-classes").value);
       labelTensor=tf.oneHot(labelTensor.squeeze().asType('int32'),num_classes)
-      console.log(labelTensor.shape)
     }
     // exclusion_list = new Array()
     // for (let i=0; i<inputTensor.shape[0];i++){
@@ -147,8 +146,7 @@ function preprocess(array){
 }
 
 document.getElementById("preprocess").addEventListener("click", () => {
-  [train_data, test_data] = preprocess(data)
-  addLayer(1, "Final") 
+  [train_data, test_data] = preprocess(data);
 
   });
 
@@ -182,7 +180,7 @@ function createModel() {
 }
 
 function get_train_options(){
-  options=["loss","optimizer","epochs","batch-size","shuffle"]
+  options=["loss","optimizer","epochs","batch-size","shuffle", "learning-rate"];
   dict={}
   
   for(option of options){
@@ -200,22 +198,24 @@ function get_train_options(){
 }
 
 async function trainModel(){
-  options_dict=get_train_options()
+  var options_dict=get_train_options()
+  var learningRate = Number(options_dict["learning-rate"]);
   
   console.log("Training...")
   // model=createModel();
   if(mode=="Regression"){
-    var loss_ =  eval(options_dict['loss']);
+    var loss_ =  lossRegressionList[Number(options_dict['loss'])][0];
     var metrics_ = ['mse'];
     var tfvis_metrics = ['loss', "val_loss"];
   } else{
-    var loss_ =  eval(options_dict['loss']);
+    var loss_ = lossClassificationList[Number(options_dict['loss'])][0];
     var metrics_ = ['accuracy'];
     var tfvis_metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
   }
 
+
   model.compile({
-    optimizer: eval(options_dict['optimizer']),
+    optimizer: optimList[Number(options_dict['optimizer'])][0](learningRate),
     loss: loss_,
     metrics: metrics_,
   });
@@ -352,6 +352,26 @@ function next_page(){
   }
   if(curr_page != 1) document.getElementById("back").style.display='inline';
   if (curr_page == NUM_PAGES) document.getElementById("next").style.display='none';
+
+  update_page(curr_page);
+
+}
+
+function update_page(page_num){
+  switch(page_num){
+    case 3:
+      console.log(countLayer);
+      if (document.getElementById('layer-final') == null) {
+        addLayer(countLayer+1, "final")
+      }
+      break;
+    case 4:
+      lossOptions();
+      break;
+  }
+
+
+
 }
 
 function prev_page(){
