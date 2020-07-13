@@ -151,6 +151,11 @@ document.getElementById("preprocess").addEventListener("click", () => {
   });
 
 
+let stop_requested = false;
+var stop_training = document.getElementById('stop-train');
+stop_training.addEventListener('click', () => {
+    stop_requested = true;
+  });
 
 
 function createModel() {
@@ -198,6 +203,7 @@ function get_train_options(){
 }
 
 async function trainModel(){
+  stop_requested = false;
   var options_dict=get_train_options()
   var learningRate = Number(options_dict["learning-rate"]);
   
@@ -231,9 +237,12 @@ async function trainModel(){
       shuffle: options_dict['shuffle'],
       validationSplit: VAL_SPLIT,
       callbacks: [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
-                  {onEpochEnd: testCallback}]
+                  {onEpochEnd: testCallback},
+                  {onTrainEnd: testModel},
+                  {onBatchEnd: () => model.stopTraining = stop_requested}]
  
   });
+
 
   // return await model.fit(inputs, labels, {
   //   batchSize,
@@ -267,10 +276,12 @@ function testModel(){
       var pred=values.argMax(axis=1);
       var result=pred.equal(labels.argMax(axis=1));
       var accuracy=result.sum().dataSync()[0]/result.shape[0];
-      document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
+      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
+      document.getElementById("console").innerHTML = "Accuracy: "+accuracy.toString();
     } else if (mode == "Regression"){
       var error = tf.losses.meanSquaredError(labels, values.squeeze())
-      document.getElementById("console").appendChild(document.createTextNode("Error: "+ error.dataSync().toString()));
+      // document.getElementById("console").appendChild(document.createTextNode("Error: "+ error.dataSync().toString()));
+      document.getElementById("console").innerHTML = "Error: "+error.dataSync().toString();
     }
     
   });
@@ -307,34 +318,34 @@ function handleTrainFiles() {
   });
   
 }
-// function handleTestFiles() {
-//   const file = this.files; /* now you can work with the file list */
+function handlePredictFiles() {
+  const file = this.files; /* now you can work with the file list */
 
-// $('#fileuploadTest').parse({
-//   config: {
-//     delimiter: ",",
-//     header:false, //Handled in the convertToMatrix
-//     complete: load_dataset
-//     //console.log//displayHTMLTable,
-//   },
-//   before: function(file, inputElem)
-//   {
-//     //console.log("Parsing file...", file);
-//   },
-//   error: function(err, file)
-//   {
-//     //console.log("ERROR:", err, file);
-//   },
-//   complete: function()
-//   {
-//     console.log("Complete")
-//     test_data=data
-//     console.log("Done with all files");
-//   }
-// });
+  $('#fileuploadPredict').parse({
+    config: {
+      delimiter: ",",
+      header:false, //Handled in the convertToMatrix
+      complete: load_dataset
+      //console.log//displayHTMLTable,
+    },
+    before: function(file, inputElem)
+    {
+      //console.log("Parsing file...", file);
+    },
+    error: function(err, file)
+    {
+      //console.log("ERROR:", err, file);
+    },
+    complete: function()
+    {
+      console.log("Complete")
+      test_data=data
+      console.log("Done with all files");
+    }
+});
 
-// }
-// module.exports = {trainModel}
+}
+module.exports = {trainModel}
 
 function show(shown, hidden) {
   document.getElementById(shown).style.display='block';
@@ -362,7 +373,7 @@ function update_page(page_num){
     case 3:
       console.log(countLayer);
       if (document.getElementById('layer-final') == null) {
-        addLayer(countLayer+1, "final")
+        addLayer(countLayer+1, "final", disabled=true)
       }
       break;
     case 4:
@@ -393,3 +404,4 @@ function prev_page(){
 //   }
 
 // }
+

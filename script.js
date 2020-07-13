@@ -23,7 +23,7 @@ lossRegressionList= [
     [tf.losses.logLoss, "Log Loss"]];
 
 
-function addLayer(layer_pos, name){
+function addLayer(layer_pos, name, disabled=false){
     //countLayer+=1;
     // Number of inputs to create
     //var number = 0;//document.getElementById("member").value;
@@ -41,6 +41,7 @@ function addLayer(layer_pos, name){
     neuronNum.type = "text";
     neuronNum.name = "layer-" + name;
     neuronNum.id = "layer-" + name;
+    neuronNum.disabled = disabled;
     num_neurons.appendChild(neuronNum)
 
 
@@ -48,6 +49,7 @@ function addLayer(layer_pos, name){
     activation.type = "text";
     activation.name = "activ-" + name;
     activation.id = "activ-" + name;
+    activation.disabled = disabled;
     
     var relu=document.createElement("option");
     relu.value="relu";
@@ -102,6 +104,7 @@ function parseLayers(){
     var layersInfo={}
     for(let i = 1; i<=countLayer; i++){
         var key="layer-"+i;
+        console.log(key)
         var layerVal = parseInt(document.getElementById("layer-"+i).value);
         var layerAct = document.getElementById("activ-"+i).value;
         layersInfo[key] = {'value':layerVal, 'activation':layerAct};
@@ -187,7 +190,7 @@ function autofill(){
         addLayer(1, 1);
         addLayer(2, 2);
         addLayer(3, 3);
-        addLayer(4, "final");
+        addLayer(4, "final", true);
         document.getElementById("layer-1").value = 250;
         document.getElementById("layer-2").value = 175;
         document.getElementById("layer-3").value = 150;
@@ -196,7 +199,7 @@ function autofill(){
         document.getElementById("activ-2").value = "relu";
         document.getElementById("activ-3").value = "relu";
         document.getElementById("activ-final").value = "linear";
-        countLayer=4;
+        countLayer=3;
     }else{
         fields_dict = {"features":5, "labels":2, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
         for (var field in fields_dict){
@@ -204,15 +207,17 @@ function autofill(){
         }
         addLayer(1, 1);
         addLayer(2, 2);
-        addLayer(3, "final");
+        addLayer(3, "final", true);
         document.getElementById("layer-1").value = 100;
         document.getElementById("layer-2").value = 100;
         document.getElementById("layer-final").value = 1;
         document.getElementById("activ-1").value = "sigmoid";
         document.getElementById("activ-2").value = "sigmoid";
         document.getElementById("activ-final").value = "linear";
-        countLayer=3;
+        countLayer=2;
     }
     
 }
+
+
 
