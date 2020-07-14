@@ -6,7 +6,7 @@ NUM_PAGES = 6
 
 var curr_page = 1;
 const trainingFile = document.getElementById('fileuploadTrain');
-const testingFile = document.getElementById('fileuploadTest');
+const predictFile = document.getElementById('fileuploadPredict');
 
 function displayHTMLTable(results){
 	var table = "<table class='table'>";
@@ -86,7 +86,7 @@ function preprocess(array){
     tf.util.shuffle(array);
 
     //Step 2. Separate data into inputs and labels an put into tensors
-    data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row, axis = 0);
+    var data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row, axis = 0);
     var inputTensor = data_matrix.gather(input_cols, axis = 1)
     var labelTensor = data_matrix.gather(label_cols, axis = 1)
     
@@ -138,17 +138,83 @@ function preprocess(array){
 
      return [{inputs: normalizedTrain, 
               labels: trainLabels, 
-              inputMax, inputMin, 
+              max: inputMax,
+              min: inputMin
               // labelMin, labelMax
               },
             {inputs: normalizedTest, labels: testLabels}]
   });
 }
 
+function preprocess_predict(array, train_data){
+  console.log(array.length)  
+  input_cols_predict = parse_text("features-predict")
+  included_row_predict = included_rows(array.length, parse_text("row-exclude-predict"))
+  
+  return tf.tidy(() => {
+
+    var data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row_predict, axis = 0);
+    var inputTensor = data_matrix.gather(input_cols_predict, axis = 1)
+
+    inputMax= train_data.max;
+    inputMin= train_data.min;
+    
+    const normalizedPredict = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+    normalizedPredict.print();
+    
+    return normalizedPredict
+  
+  });
+
+}
+
+function predict(predict_data){
+  
+  return tf.tidy(()=>{
+    var pred = model.predict(predict_data);
+   
+    if (mode == "Classification"){
+      pred=pred.argMax(axis=1);
+      // console.log(pred)
+      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString())) 
+    }
+    console.log(pred.dataSync())
+    return pred.dataSync()
+  });
+
+}
+
 document.getElementById("preprocess").addEventListener("click", () => {
   [train_data, test_data] = preprocess(data);
 
   });
+
+document.getElementById("preprocess-predict").addEventListener("click", () => {
+  console.log("Start")
+  console.log(data.length)  
+  predict_data = preprocess_predict(data,train_data);
+  console.log(predict_data.shape)
+});
+
+document.getElementById("predict-button").addEventListener("click", () => {
+  predictions = predict(predict_data);
+});
+
+function download_csv() {
+  var csv = 'Preds\n';
+  predictions.forEach(function(row) {
+    // if(row.join == 'undefined')
+          csv += row//.join(',');
+          csv += "\n";
+  });
+
+  console.log(csv);
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'predictions.csv';
+  hiddenElement.click();
+}
 
 
 let stop_requested = false;
@@ -290,10 +356,10 @@ function testModel(){
 
 
 trainingFile.addEventListener("change", handleTrainFiles, false);
-//testingFile.addEventListener("change", handleTestFiles, false)
+predictFile.addEventListener("change", handlePredictFiles, false);
 
 function handleTrainFiles() {
-  const file = this.files; /* now you can work with the file list */
+  var file = this.files; /* now you can work with the file list */
   
   $('#fileuploadTrain').parse({
     config: {
@@ -318,8 +384,9 @@ function handleTrainFiles() {
   });
   
 }
+
 function handlePredictFiles() {
-  const file = this.files; /* now you can work with the file list */
+  var file = this.files; /* now you can work with the file list */
 
   $('#fileuploadPredict').parse({
     config: {
@@ -338,14 +405,12 @@ function handlePredictFiles() {
     },
     complete: function()
     {
+      console.log(data.length)
       console.log("Complete")
-      test_data=data
-      console.log("Done with all files");
     }
 });
 
 }
-module.exports = {trainModel}
 
 function show(shown, hidden) {
   document.getElementById(shown).style.display='block';
