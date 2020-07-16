@@ -1,7 +1,8 @@
-TRAIN_SPLIT = 0.9
-VAL_SPLIT = 0.1
-TEST_SPLIT = 0.1
-NUM_PAGES = 6
+train_split = 0.9
+val_split = 0.1
+test_split = 0.1
+
+const NUM_PAGES = 6
 
 
 var curr_page = 1;
@@ -109,7 +110,7 @@ function preprocess(array){
     // const inputTensor = inputTensor.gather(included_row, axis = 0)
     // const labelTensor = labelTensor.gather(included_row, axis = 0)
     var datasetSize = inputTensor.shape[0]
-    var trainSize = parseInt(datasetSize*TRAIN_SPLIT)
+    var trainSize = parseInt(datasetSize*train_split)
     var testSize = datasetSize - trainSize
 
     var trainData = tf.slice(inputTensor, 0, trainSize)
@@ -185,6 +186,10 @@ function predict(predict_data){
 }
 
 document.getElementById("preprocess").addEventListener("click", () => {
+  train_split=document.getElementById("train-split").value;
+  test_split=document.getElementById("test-split").value;
+  val_split=document.getElementById("val-split").value;
+
   [train_data, test_data] = preprocess(data);
 
   });
@@ -301,7 +306,7 @@ async function trainModel(){
       batchSize,
       epochs,
       shuffle: options_dict['shuffle'],
-      validationSplit: VAL_SPLIT,
+      validationSplit: val_split,
       callbacks: [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
                   {onEpochEnd: testCallback},
                   {onTrainEnd: testModel},
@@ -314,7 +319,7 @@ async function trainModel(){
   //   batchSize,
   //   epochs,
   //   shuffle: true,
-  //   //validationSplit: VAL_SPLIT,
+  //   //validationSplit: val_split,
   //   callbacks: {
   //     onEpochEnd: (epoch, logs) => {
   //       const values = model.predict(inputs);
@@ -446,8 +451,21 @@ function update_page(page_num){
       break;
   }
 
+}
 
+async function download_model(){
+  await model.save('downloads://my-model');
+}
 
+async function upload_model(){
+  console.log($('fileuploadModelJson'))
+  console.log(document.getElementById('fileuploadModelJson').files[0].name)
+
+  const uploadJSONInput = document.getElementById('fileuploadModelJson');
+  const uploadWeightsInput = document.getElementById('fileuploadModelBin');
+
+  model = await tf.loadLayersModel(tf.io.browserFiles(
+     [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
 }
 
 function prev_page(){

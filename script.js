@@ -180,7 +180,6 @@ function start(){
 }
 
 function autofill(){
-    
 
     if (mode == "Classification"){
         fields_dict = {"features":"1-8", "labels":9,"num-classes":7, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
