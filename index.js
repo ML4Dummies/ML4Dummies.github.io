@@ -1,12 +1,13 @@
-TRAIN_SPLIT = 0.9
-VAL_SPLIT = 0.1
-TEST_SPLIT = 0.1
-NUM_PAGES = 6
+train_split = 0.9
+val_split = 0.1
+test_split = 0.1
+
+const NUM_PAGES = 6
 
 
 var curr_page = 1;
 const trainingFile = document.getElementById('fileuploadTrain');
-const testingFile = document.getElementById('fileuploadTest');
+const predictFile = document.getElementById('fileuploadPredict');
 
 function displayHTMLTable(results){
 	var table = "<table class='table'>";
@@ -86,7 +87,7 @@ function preprocess(array){
     tf.util.shuffle(array);
 
     //Step 2. Separate data into inputs and labels an put into tensors
-    data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row, axis = 0);
+    var data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row, axis = 0);
     var inputTensor = data_matrix.gather(input_cols, axis = 1)
     var labelTensor = data_matrix.gather(label_cols, axis = 1)
     
@@ -109,7 +110,7 @@ function preprocess(array){
     // const inputTensor = inputTensor.gather(included_row, axis = 0)
     // const labelTensor = labelTensor.gather(included_row, axis = 0)
     var datasetSize = inputTensor.shape[0]
-    var trainSize = parseInt(datasetSize*TRAIN_SPLIT)
+    var trainSize = parseInt(datasetSize*train_split)
     var testSize = datasetSize - trainSize
 
     var trainData = tf.slice(inputTensor, 0, trainSize)
@@ -138,17 +139,87 @@ function preprocess(array){
 
      return [{inputs: normalizedTrain, 
               labels: trainLabels, 
-              inputMax, inputMin, 
+              max: inputMax,
+              min: inputMin
               // labelMin, labelMax
               },
             {inputs: normalizedTest, labels: testLabels}]
   });
 }
 
+function preprocess_predict(array, train_data){
+  console.log(array.length)  
+  input_cols_predict = parse_text("features-predict")
+  included_row_predict = included_rows(array.length, parse_text("row-exclude-predict"))
+  
+  return tf.tidy(() => {
+
+    var data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row_predict, axis = 0);
+    var inputTensor = data_matrix.gather(input_cols_predict, axis = 1)
+
+    inputMax= train_data.max;
+    inputMin= train_data.min;
+    
+    const normalizedPredict = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
+    normalizedPredict.print();
+    
+    return normalizedPredict
+  
+  });
+
+}
+
+function predict(predict_data){
+  
+  return tf.tidy(()=>{
+    var pred = model.predict(predict_data);
+   
+    if (mode == "Classification"){
+      pred=pred.argMax(axis=1);
+      // console.log(pred)
+      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString())) 
+    }
+    console.log(pred.dataSync())
+    return pred.dataSync()
+  });
+
+}
+
 document.getElementById("preprocess").addEventListener("click", () => {
+  train_split=document.getElementById("train-split").value;
+  test_split=document.getElementById("test-split").value;
+  val_split=document.getElementById("val-split").value;
+
   [train_data, test_data] = preprocess(data);
 
   });
+
+document.getElementById("preprocess-predict").addEventListener("click", () => {
+  console.log("Start")
+  console.log(data.length)  
+  predict_data = preprocess_predict(data,train_data);
+  console.log(predict_data.shape)
+});
+
+document.getElementById("predict-button").addEventListener("click", () => {
+  predictions = predict(predict_data);
+});
+
+function download_csv() {
+  var csv = 'Preds\n';
+  predictions.forEach(function(row) {
+    // if(row.join == 'undefined')
+          csv += row//.join(',');
+          csv += "\n";
+  });
+
+  console.log(csv);
+  var hiddenElement = document.createElement('a');
+  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+  hiddenElement.target = '_blank';
+  hiddenElement.download = 'predictions.csv';
+  hiddenElement.click();
+}
 
 
 let stop_requested = false;
@@ -235,7 +306,7 @@ async function trainModel(){
       batchSize,
       epochs,
       shuffle: options_dict['shuffle'],
-      validationSplit: VAL_SPLIT,
+      validationSplit: val_split,
       callbacks: [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
                   {onEpochEnd: testCallback},
                   {onTrainEnd: testModel},
@@ -248,7 +319,7 @@ async function trainModel(){
   //   batchSize,
   //   epochs,
   //   shuffle: true,
-  //   //validationSplit: VAL_SPLIT,
+  //   //validationSplit: val_split,
   //   callbacks: {
   //     onEpochEnd: (epoch, logs) => {
   //       const values = model.predict(inputs);
@@ -290,10 +361,10 @@ function testModel(){
 
 
 trainingFile.addEventListener("change", handleTrainFiles, false);
-//testingFile.addEventListener("change", handleTestFiles, false)
+predictFile.addEventListener("change", handlePredictFiles, false);
 
 function handleTrainFiles() {
-  const file = this.files; /* now you can work with the file list */
+  var file = this.files; /* now you can work with the file list */
   
   $('#fileuploadTrain').parse({
     config: {
@@ -318,8 +389,9 @@ function handleTrainFiles() {
   });
   
 }
+
 function handlePredictFiles() {
-  const file = this.files; /* now you can work with the file list */
+  var file = this.files; /* now you can work with the file list */
 
   $('#fileuploadPredict').parse({
     config: {
@@ -338,14 +410,12 @@ function handlePredictFiles() {
     },
     complete: function()
     {
+      console.log(data.length)
       console.log("Complete")
-      test_data=data
-      console.log("Done with all files");
     }
 });
 
 }
-module.exports = {trainModel}
 
 function show(shown, hidden) {
   document.getElementById(shown).style.display='block';
@@ -381,8 +451,21 @@ function update_page(page_num){
       break;
   }
 
+}
 
+async function download_model(){
+  await model.save('downloads://my-model');
+}
 
+async function upload_model(){
+  console.log($('fileuploadModelJson'))
+  console.log(document.getElementById('fileuploadModelJson').files[0].name)
+
+  const uploadJSONInput = document.getElementById('fileuploadModelJson');
+  const uploadWeightsInput = document.getElementById('fileuploadModelBin');
+
+  model = await tf.loadLayersModel(tf.io.browserFiles(
+     [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
 }
 
 function prev_page(){
