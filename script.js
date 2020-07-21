@@ -1,4 +1,4 @@
-var countLayer=0;
+let countLayer=0;
 mode='Classification'
 optimList=[
     [tf.train.adam,"Adam"],
@@ -29,15 +29,15 @@ function addLayer(layer_pos, name, disabled=false){
     //var number = 0;//document.getElementById("member").value;
     // Container <div> where dynamic content will be placed
     // var container = document.getElementById("layer-customize");
-    var table = document.getElementById("model-table");
-    var row = table.insertRow(layer_pos);
-    var layer_num = row.insertCell(0);
-    var num_neurons = row.insertCell(1);
-    var activ = row.insertCell(2);
+    let table = document.getElementById("model-table");
+    let row = table.insertRow(layer_pos);
+    let layer_num = row.insertCell(0);
+    let num_neurons = row.insertCell(1);
+    let activ = row.insertCell(2);
 
     layer_num.appendChild(document.createTextNode(name));
 
-    var neuronNum = document.createElement("input");
+    let neuronNum = document.createElement("input");
     neuronNum.type = "text";
     neuronNum.name = "layer-" + name;
     neuronNum.id = "layer-" + name;
@@ -45,33 +45,33 @@ function addLayer(layer_pos, name, disabled=false){
     num_neurons.appendChild(neuronNum)
 
 
-    var activation = document.createElement("select");
+    let activation = document.createElement("select");
     activation.type = "text";
     activation.name = "activ-" + name;
     activation.id = "activ-" + name;
     activation.disabled = disabled;
     
-    var relu=document.createElement("option");
+    let relu=document.createElement("option");
     relu.value="relu";
     relu.text="ReLu";
     activation.add(relu);
     
-    var sigmoid=document.createElement("option");
+    let sigmoid=document.createElement("option");
     sigmoid.value="sigmoid";
     sigmoid.text="Sigmoid";
     activation.add(sigmoid);
 
-    var softmax=document.createElement("option");
+    let softmax=document.createElement("option");
     softmax.value="softmax";
     softmax.text="Softmax";
     activation.add(softmax);
 
-    var tanh = document.createElement("option");
+    let tanh = document.createElement("option");
     tanh.value="tanh"
     tanh.text="Tanh"
     activation.add(tanh);
         
-    var linear = document.createElement("option");
+    let linear = document.createElement("option");
     linear.value='linear'
     linear.text="Linear"
     activation.add(linear);
@@ -86,8 +86,8 @@ document.getElementById("add-layer").addEventListener("click", () => {
     addLayer(countLayer, countLayer);
 });
 
-var radioClassification=document.getElementById('classification');
-var radioRegression=document.getElementById('regression');
+let radioClassification=document.getElementById('classification');
+let radioRegression=document.getElementById('regression');
 
 radioClassification.onclick = function() {
     document.getElementById("num-classes-prompt").style.display = "block";
@@ -101,27 +101,27 @@ radioRegression.onclick = function() {
 
 
 function parseLayers(){
-    var layersInfo={}
+    let layersInfo={}
     for(let i = 1; i<=countLayer; i++){
-        var key="layer-"+i;
+        let key="layer-"+i;
         console.log(key)
-        var layerVal = parseInt(document.getElementById("layer-"+i).value);
-        var layerAct = document.getElementById("activ-"+i).value;
+        let layerVal = parseInt(document.getElementById("layer-"+i).value);
+        let layerAct = document.getElementById("activ-"+i).value;
         layersInfo[key] = {'value':layerVal, 'activation':layerAct};
     }
 
-    var key="final";
+    let key="final";
     if (mode==='Classification'){
         
-        var layerVal = parseInt(document.getElementById("num-classes").value);
-        // var num_classes = layerVal;
-        var layerAct = 'linear';//document.getElementById("").value;
+        let layerVal = parseInt(document.getElementById("num-classes").value);
+        // let num_classes = layerVal;
+        let layerAct = 'linear';//document.getElementById("").value;
         layersInfo[key] = {'value':layerVal, 'activation':layerAct};
     }
     else{
-        // var labelCols=getLabelCols()
-        var layerVal = label_cols.length;
-        // var num_classes = layerVal;
+        // let labelCols=getLabelCols()
+        let layerVal = label_cols.length;
+        // let num_classes = layerVal;
         layersInfo[key] = {'value':layerVal, 'activation':'linear'};
     }
 
@@ -130,15 +130,15 @@ function parseLayers(){
 
 
 function lossOptions(){
-    var lossDiv = document.getElementById("lossDropdown");
+    let lossDiv = document.getElementById("lossDropdown");
     lossDiv.removeChild(lossDiv.firstChild);
-    var lossSelect = document.createElement("select");
+    let lossSelect = document.createElement("select");
     lossSelect.id = "loss";
                            
     lossList = mode == "Classification" ? lossClassificationList : lossRegressionList;
 
     for(let i = 0; i < lossList.length; i++){
-        var lossVar = document.createElement("option");
+        let lossVar = document.createElement("option");
         lossVar.value=i
         lossVar.text=lossList[i][1]
         lossSelect.add(lossVar)
@@ -149,8 +149,8 @@ function lossOptions(){
 
 function optimOptions(){
    
-    var optimDiv = document.getElementById("optimizerDropdown");
-    var optimSelect = document.createElement("select");
+    let optimDiv = document.getElementById("optimizerDropdown");
+    let optimSelect = document.createElement("select");
     optimSelect.id = "optimizer";
 
     // var optimList=[
@@ -165,7 +165,7 @@ function optimOptions(){
     
 
     for(let i = 0; i < optimList.length; i++){
-        var optimVar = document.createElement("option");
+        let optimVar = document.createElement("option");
         optimVar.value=i;
         optimVar.text=optimList[i][1]
         optimSelect.add(optimVar)
@@ -183,7 +183,7 @@ function autofill(){
 
     if (mode == "Classification"){
         fields_dict = {"features":"1-8", "labels":9,"num-classes":7, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
-        for (var field in fields_dict){
+        for (let field in fields_dict){
             document.getElementById(field).value = fields_dict[field];
         }
         addLayer(1, 1);
@@ -198,10 +198,14 @@ function autofill(){
         document.getElementById("activ-2").value = "relu";
         document.getElementById("activ-3").value = "relu";
         document.getElementById("activ-final").value = "linear";
+        document.getElementById("train-split").value = 0.9;
+        document.getElementById("test-split").value = 0.1;
+        document.getElementById("val-split").value = 0.1;
         countLayer=3;
+        
     }else{
         fields_dict = {"features":5, "labels":2, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
-        for (var field in fields_dict){
+        for (let field in fields_dict){
             document.getElementById(field).value = fields_dict[field];
         }
         addLayer(1, 1);
@@ -213,6 +217,9 @@ function autofill(){
         document.getElementById("activ-1").value = "sigmoid";
         document.getElementById("activ-2").value = "sigmoid";
         document.getElementById("activ-final").value = "linear";
+        document.getElementById("train-split").value = 0.9;
+        document.getElementById("test-split").value = 0.1;
+        document.getElementById("val-split").value = 0.1;
         countLayer=2;
     }
     

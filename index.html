@@ -86,11 +86,11 @@
               </div> 
                -->
                 <label class="row" for="train-split">What fraction of the data do you want to use for training?</label>
-                <input type="text" class="form-control row col-6" id="train-split" name="train-split" placeholder="0.9">
+                <input type="text" class="form-control row col-6" id="train-split" name="train-split" >
                 <label class="row" for="test-split">What fraction of the data do you want to use for testing?</label>
-                <input type="text" class="form-control row col-6" id="test-split" name="test-split" placeholder="0.1">
+                <input type="text" class="form-control row col-6" id="test-split" name="test-split" >
                 <label class="row" for="val-split">What fraction of the training data do you want to use for validation?</label>
-                <input type="text" class="form-control row col-6" id="val-split" name="val-split" placeholder="0.1">
+                <input type="text" class="form-control row col-6" id="val-split" name="val-split" >
 
               <div class="text-center">
                 <button class="row btn btn-info" id="preprocess" type='button'>Preprocess</button>
@@ -131,7 +131,7 @@
             </div>
             <br>
             <button class="btn btn-light" id="add-layer" type='button'>Add Layer</button>
-            <button class="btn btn-info" id="create-model" onmousedown="createModel()" type='button'>Create Model</button>
+            <button class="btn btn-info" id="create-model" type='button'>Create Model</button>
           </div>
         </div>
 
@@ -203,9 +203,9 @@
 
         <div>
           </br>
-          <button class="float-left btn btn-secondary" id="back" onclick="prev_page()" style="display:none"
+          <button class="float-left btn btn-secondary" id="back" style="display:none"
             type='button'>Back</button>
-          <button class="float-right btn btn-primary" id="next" onclick="next_page()" type='button'>Next</button>
+          <button class="float-right btn btn-primary" id="next" type='button'>Next</button>
         </div>
         <!-- 
         <div class="text-right">
@@ -217,8 +217,7 @@
   </div>
 
   <script src="script.js"></script>
-  <script src="index.js"></script>
-  <script src="pitch_type.js"></script>
+  <script type="module" src="index.js"></script>
 
 
 </body>
