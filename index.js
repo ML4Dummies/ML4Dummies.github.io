@@ -1,31 +1,25 @@
-const NUM_PAGES = 6
 
-let curr_page = 1;
-const trainingFile = document.getElementById('fileuploadTrain');
 const predictFile = document.getElementById('fileuploadPredict');
 
-function displayHTMLTable(results){
-	let table = "<table class='table'>";
-	let data = results.data;
-	 
-	for(i=0;i<data.length;i++){
-		table+= "<tr>";
-		let row = data[i];
-		let cells = row.join(",").split(",");
-		 
-		for(j=0;j<cells.length;j++){
-			table+= "<td>";
-			table+= cells[j];
-			table+= "</th>";
-		}
-		table+= "</tr>";
-	}
-  table+= "</table>";
-  console.log("test");
-  document.querySelector('#console').innerHTML = table;
-	// $("#parsed_csv_list").html(table);
-}
 
+import GLOBALS from "./config.js";
+import Dataset from "./dataset.js";
+import Model from "./ML/model.js";
+import Autofill from "./AI/autofill.js";
+import TrainOptionsSection from "./UI/trainOptionsSection.js";
+import ModelSection from "./UI/modelSection.js";
+import IntroSection from "./UI/introSection.js";
+import Navigation from "./UI/navigation.js";
+
+
+
+GLOBALS.model = new Model();
+GLOBALS.dataset = new Dataset('fileuploadTrain');
+GLOBALS.modelSection = new ModelSection();
+GLOBALS.autofill = new Autofill();
+GLOBALS.trainOptionsSection = new TrainOptionsSection()
+GLOBALS.introSection = new IntroSection();
+GLOBALS.navigation = new Navigation();
 
 
 
@@ -68,11 +62,11 @@ function predict(predict_data){
 }
 
 document.getElementById("preprocess").addEventListener("click", () => {
-  dataset.train_split=document.getElementById("train-split").value;
-  dataset.test_split=document.getElementById("test-split").value;
-  dataset.val_split=document.getElementById("val-split").value;
-  dataset.preprocess();
-  console.log(dataset.normalizedTrain)
+  GLOBALS.dataset.train_split=document.getElementById("train-split").value;
+  GLOBALS.dataset.test_split=document.getElementById("test-split").value;
+  GLOBALS.dataset.val_split=document.getElementById("val-split").value;
+  GLOBALS.dataset.preprocess();
+  console.log(GLOBALS.dataset.normalizedTrain)
   });
 
 document.getElementById("preprocess-predict").addEventListener("click", () => {
@@ -109,31 +103,8 @@ stop_training.addEventListener('click', () => {
     stop_requested = true;
   });
 
-let model = tf.sequential();
-function createModel() {
-  // Create a sequential model
-  let modelDict=parseLayers()
-  for(let key in modelDict){
-    let num = modelDict[key].value;
-    let activ = modelDict[key].activation;
-    if(key=='layer-1'){
-      model.add(tf.layers.dense({units: num, activation: activ, inputShape: [input_cols.length]}));
-    }
-    else{
-      model.add(tf.layers.dense({units: num, activation: activ}));
-    }
-  }
 
-  console.log('Model Summary:')
-  model.summary()
-  // const model = tf.sequential();
-  // model.add(tf.layers.dense({units: 250, activation: 'relu', inputShape: [8]}));
-  // model.add(tf.layers.dense({units: 175, activation: 'relu'}));
-  // model.add(tf.layers.dense({units: 150, activation: 'relu'}));
-  //model.add(tf.layers.dense({units: NUM_PITCH_CLASSES, activation: 'softmax'}));
 
-  // return model;
-}
 
 function get_train_options(){
   options=["loss","optimizer","epochs","batch-size","shuffle", "learning-rate"];
@@ -240,8 +211,7 @@ function testModel(){
 }
 
 
-import Dataset from "./dataset.js"
-let dataset = new Dataset(trainingFile);
+
 
 // trainingFile.addEventListener("change", handleTrainFiles, false);
 // predictFile.addEventListener("change", handlePredictFiles, false);
@@ -256,36 +226,7 @@ function show(shown, hidden) {
 
 
 
-function next_page(){
-  
 
-  if(curr_page < NUM_PAGES){
-    curr_page++
-    // page_operations(curr_page)
-    document.getElementById("Page"+String(curr_page)).style.display='flex';
-    document.getElementById("Page"+String(curr_page - 1)).style.display='none';
-  }
-  if(curr_page != 1) document.getElementById("back").style.display='inline';
-  if (curr_page == NUM_PAGES) document.getElementById("next").style.display='none';
-
-  update_page(curr_page);
-
-}
-
-function update_page(page_num){
-  switch(page_num){
-    case 3:
-      console.log(countLayer);
-      if (document.getElementById('layer-final') == null) {
-        addLayer(countLayer+1, "final", disabled=true)
-      }
-      break;
-    case 4:
-      lossOptions();
-      break;
-  }
-
-}
 
 async function download_model(){
   await model.save('downloads://my-model');
@@ -302,29 +243,10 @@ async function upload_model(){
      [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
 }
 
-function prev_page(){
-  if(curr_page > 1){
-    curr_page--;
-    // page_operations(curr_page)
-    document.getElementById("Page"+String(curr_page)).style.display='flex';
-    document.getElementById("Page"+String(curr_page + 1)).style.display='none';
-  }
-  if(curr_page == 1) document.getElementById("back").style.display='none';
-  if (curr_page != NUM_PAGES) document.getElementById("next").style.display='inline';
-}
-
-document.getElementById("next").onclick = next_page;
-document.getElementById("back").onclick = prev_page;
-
-document.getElementById("create-model").onclick = createModel;
 
 
-// functions page_operations(page){
 
-//   switch(page){
-//     case "Page1":
 
-//   }
 
-// }
+
 

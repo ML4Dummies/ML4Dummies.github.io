@@ -1,11 +1,13 @@
+import GLOBALS from "../config.js"
 export default class Dataset {
 
-    constructor(data_element) {
-        this.data_element = data_element
+    constructor(file_id) {
+        this.data_element = document.getElementById(file_id);
         this.data_element.addEventListener("change", this.parse.bind(this), false);
+
         this.data = null;
-        this.input_cols = null;
-        this.label_cols = null;
+        this.inputCols = null;
+        this.labelCols = null;
         this.included_row = null;
         this.num_classes = null;
         this.datasetSize = null;
@@ -63,17 +65,18 @@ export default class Dataset {
 
     preprocess() {
         let array = this.data;
-        this.input_cols = this.parse_text("features")
-        this.label_cols = this.parse_text("labels")
+        this.inputCols = this.parse_text("features")
+        this.labelCols = this.parse_text("labels")
         this.included_row = this.included_rows(array.length, this.parse_text("row-exclude"))
+        let mode = GLOBALS.mode
 
         tf.tidy(() => {
 
             tf.util.shuffle(array);
 
             let data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(this.included_row, 0);
-            let inputTensor = data_matrix.gather(this.input_cols, 1)
-            let labelTensor = data_matrix.gather(this.label_cols, 1)
+            let inputTensor = data_matrix.gather(this.inputCols, 1)
+            let labelTensor = data_matrix.gather(this.labelCols, 1)
 
             if (mode == 'Classification') {
                 this.num_classes = parseInt(document.getElementById("num-classes").value);
@@ -98,14 +101,6 @@ export default class Dataset {
 
         });
 
-        console.log("start", this.input_cols,
-            this.label_cols,
-            this.included_row,
-            this.num_classes,
-            this.datasetSize,
-            this.train_split,
-            this.test_split,
-            this.val_split, "end")
     }
 
 
