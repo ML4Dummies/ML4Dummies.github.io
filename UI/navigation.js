@@ -33,8 +33,8 @@ export default class Navigation {
         if (this.curr_page > 1) {
             this.curr_page--;
             // page_operations(curr_page)
-            document.getElementById("Page" + String(curr_page)).style.display = 'flex';
-            document.getElementById("Page" + String(curr_page + 1)).style.display = 'none';
+            document.getElementById("Page" + String(this.curr_page)).style.display = 'flex';
+            document.getElementById("Page" + String(this.curr_page + 1)).style.display = 'none';
         }
 
         if (this.curr_page == 1) document.getElementById("back").style.display = 'none';

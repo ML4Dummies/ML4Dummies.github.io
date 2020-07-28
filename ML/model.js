@@ -39,7 +39,7 @@ export default class Model {
   }
 
 
-  trainModel() {
+  async trainModel() {
     let mode= GLOBALS.mode
     this.stop_requested = false
     let trainOptions = GLOBALS.trainOptionsSection
@@ -60,7 +60,7 @@ export default class Model {
       var tfvis_metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
     }
 
-
+      
     this.model.compile({
       optimizer: trainOptions.optimList[Number(options_dict['optimizer'])][0](learningRate),
       loss: loss_,
@@ -70,23 +70,22 @@ export default class Model {
     const batchSize = Number(options_dict['batch-size']);
     const epochs = Number(options_dict['epochs']);
 
-    return this.model.fit(inputs, labels, {
+    return await this.model.fit(inputs, labels, {
       batchSize,
-      epochs
-      //,
-      // shuffle: options_dict['shuffle'],
-      // validationSplit:Number(document.getElementById("val-split").value),
-      // callbacks: 
-      // [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
-      // { onEpochEnd: this.testCallback },
-      // // { onTrainEnd: testModel },
-      // { onBatchEnd: () => this.model.stopTraining = stop_requested }]
+      epochs,
+      shuffle: options_dict['shuffle'],
+      validationSplit:Number(document.getElementById("val-split").value),
+      callbacks: 
+      [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
+      { onEpochEnd: this.testCallback },
+      // { onTrainEnd: testModel },
+      { onBatchEnd: () => this.model.stopTraining = this.stop_requested }]
 
     });
   }
 
   testCallback() {
-
+    console.log("Training")
   }
 
 }
