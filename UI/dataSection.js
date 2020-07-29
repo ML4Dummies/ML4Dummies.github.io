@@ -19,7 +19,8 @@ export default class DataSection {
         
         document.getElementById("preprocess").addEventListener("click", () => {
             this.getDataOptions();
-            GLOBALS.dataset.preprocess();
+            GLOBALS.dataset.preprocess(this.data, this.inputCols, this.labelCols, 
+                this.includedRows, this.trainSplit, this.numClasses);
             console.log("Done preprocessing")
             console.log(GLOBALS.dataset)
           });
@@ -43,7 +44,7 @@ export default class DataSection {
         var data = results.data;
         var matrix = new Array();
 
-        for (let i = 1; i < data.length - 1; i++) {
+        for (let i = 0; i < data.length - 1; i++) {
             var row = data[i];
             var cells = row.map(Number);
             matrix.push(cells);
@@ -82,6 +83,7 @@ export default class DataSection {
         this.inputCols = this.parse_text("features")
         this.labelCols = this.parse_text("labels")
         this.includedRows = this.getIncludedRows(this.data.length, this.parse_text("row-exclude"))
+        this.numClasses = parseInt(document.getElementById("num-classes").value);
         
         this.trainSplit = document.getElementById("train-split").value;
         this.testSplit = document.getElementById("test-split").value;

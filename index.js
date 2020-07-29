@@ -15,29 +15,13 @@ import DataSection from "./UI/dataSection.js";
 GLOBALS.navigation = new Navigation();
 GLOBALS.introSection = new IntroSection();
 GLOBALS.autofill = new Autofill();
-GLOBALS.dataset = new Dataset();
 GLOBALS.dataSection = new DataSection('fileuploadTrain');
+GLOBALS.dataset = new Dataset();
+
 GLOBALS.modelSection = new ModelSection();
 GLOBALS.model = new Model();
 GLOBALS.trainOptionsSection = new TrainOptionsSection();
 
-// document.getElementById("train").onclick = GLOBALS.model.test.bind(GLOBALS.model)
-
-// async function test() {
-//   const model = tf.sequential({
-//     layers: [tf.layers.dense({ units: 1, inputShape: [10] })]
-//   });
-//   model.compile({ optimizer: 'sgd', loss: 'meanSquaredError' });
-//   for (let i = 1; i < 5; ++i) {
-//     const h = await model.fit(tf.ones([8, 10]), tf.ones([8, 1]), {
-//       batchSize: 4,
-//       epochs: 3
-//     });
-//     console.log("Loss after Epoch " + i + " : " + h.history.loss[0]);
-//   }
-// }
-
-// GLOBALS.model.test()
 
 
 function preprocess_predict(array, train_data) {
@@ -62,21 +46,7 @@ function preprocess_predict(array, train_data) {
 
 }
 
-function predict(predict_data) {
 
-  return tf.tidy(() => {
-    let pred = model.predict(predict_data);
-
-    if (mode == "Classification") {
-      pred = pred.argMax(1);
-      // console.log(pred)
-      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString())) 
-    }
-    console.log(pred.dataSync())
-    return pred.dataSync()
-  });
-
-}
 
 document.getElementById("preprocess-predict").addEventListener("click", () => {
   console.log("Start")

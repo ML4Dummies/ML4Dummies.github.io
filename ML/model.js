@@ -21,13 +21,13 @@ export default class Model {
     let modelSection = GLOBALS.modelSection;
     this.modelDict = modelSection.parseLayers();
 
-    let dataset = GLOBALS.dataset;
+    let dataSection = GLOBALS.dataSection;
 
     for (let key in this.modelDict) {
       let num = this.modelDict[key].value;
       let activ = this.modelDict[key].activation;
       if (key == 'layer-1') {
-        this.model.add(tf.layers.dense({ units: num, activation: activ, inputShape: [dataset.inputCols.length] }));
+        this.model.add(tf.layers.dense({ units: num, activation: activ, inputShape: [dataSection.inputCols.length] }));
       }
       else {
         this.model.add(tf.layers.dense({ units: num, activation: activ }));
@@ -72,10 +72,18 @@ export default class Model {
     const batchSize = Number(options_dict['batch-size']);
     const epochs = Number(options_dict['epochs']);
 
+
+    if (options_dict['shuffle']){
+      let indices = [...Array(inputs.shape[0]).keys()];
+      tf.util.shuffle(indices);
+      inputs = inputs.gather(indices, 0);
+      labels = labels.gather(indices, 0);
+    }
+    
+
     return await this.model.fit(inputs, labels, {
       batchSize,
       epochs,
-      shuffle: options_dict['shuffle'],
       validationSplit:Number(document.getElementById("val-split").value),
       callbacks: 
       [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
@@ -91,7 +99,7 @@ export default class Model {
   }
 
   async downloadModel() {
-    await this.model.save('downloads://my-model.json');
+    await this.model.save('downloads://my-model');
   }
 
   
@@ -104,6 +112,21 @@ export default class Model {
       [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
     
       console.log("Model uploaded")
+  }
+
+  predict(predict_data) {
+
+    let mode = GLOBALS.mode;
+    let pred = this.model.predict(predict_data);
+
+    if (mode == "Classification") {
+      pred = pred.argMax(1);
+      // console.log(pred)
+      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString())) 
+    }
+    console.log(pred.dataSync())
+    return pred.dataSync()
+
   }
 
 

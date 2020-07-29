@@ -67,9 +67,9 @@ export default class ModelSection{
 
     parseLayers(){
 
-        let dataset = GLOBALS.dataset;
+        let dataSection = GLOBALS.dataSection;
         let mode = GLOBALS.mode;
-        let labelCols = dataset.labelCols;
+        let labelCols = dataSection.labelCols;
 
         let layersInfo={}
         for(let i = 1; i<=this.countLayer; i++){
