@@ -5,13 +5,14 @@ export default class Model {
   constructor() {
     this.model = tf.sequential();
     this.modelDict = null;
+    this.stop_requested = false;
 
     document.getElementById("create-model").onclick = this.createModel.bind(this);
     document.getElementById("train").onclick = this.trainModel.bind(this);
-    
-    // document.getElementById("download").onclick = this.trainModel.bind(this);
-    this.stop_requested = false
+    document.getElementById("download").onclick = this.downloadModel.bind(this);
+    document.getElementById("loadModel").onclick = this.uploadModel.bind(this);
     document.getElementById("stop").onclick = () => {this.stop_requested = true};
+
   }
 
   createModel() {
@@ -54,6 +55,7 @@ export default class Model {
       var loss_ = trainOptions.lossRegressionList[Number(options_dict['loss'])][0];
       var metrics_ = ['mse'];
       var tfvis_metrics = ['loss', "val_loss"];
+      console.log("Reg")
     } else {
       var loss_ = trainOptions.lossClassificationList[Number(options_dict['loss'])][0];
       var metrics_ = ['accuracy'];
@@ -87,5 +89,23 @@ export default class Model {
   testCallback() {
     console.log("Training")
   }
+
+  async downloadModel() {
+    await this.model.save('downloads://my-model.json');
+  }
+
+  
+  async uploadModel() {
+    console.log("Uploading model ...")
+    const uploadJSONInput = document.getElementById('fileuploadModelJson');
+    const uploadWeightsInput = document.getElementById('fileuploadModelBin');
+
+    this.model = await tf.loadLayersModel(tf.io.browserFiles(
+      [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
+    
+      console.log("Model uploaded")
+  }
+
+
 
 }

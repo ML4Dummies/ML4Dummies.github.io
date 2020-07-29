@@ -145,23 +145,6 @@ function show(shown, hidden) {
 
 
 
-async function download_model() {
-  await model.save('downloads://my-model');
-}
-
-async function upload_model() {
-  console.log($('fileuploadModelJson'))
-  console.log(document.getElementById('fileuploadModelJson').files[0].name)
-
-  const uploadJSONInput = document.getElementById('fileuploadModelJson');
-  const uploadWeightsInput = document.getElementById('fileuploadModelBin');
-
-  model = await tf.loadLayersModel(tf.io.browserFiles(
-    [uploadJSONInput.files[0], uploadWeightsInput.files[0]]));
-}
-
-
-
 
 
 

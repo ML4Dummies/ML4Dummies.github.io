@@ -5,7 +5,6 @@ export default class Autofill {
 
     constructor(){
 
-        this.mode = "Classification";
         this.modelSection = null;
 
         document.getElementById("autofill").onclick = this.autofill.bind(this);
@@ -13,10 +12,12 @@ export default class Autofill {
     }
 
     autofill(){
+
+        let mode = GLOBALS.mode;
         this.modelSection = GLOBALS.modelSection;
         let addLayer = this.modelSection.addLayer;
 
-        if (this.mode == "Classification"){
+        if (mode == "Classification"){
             let fields_dict = {"features":"1-8", "labels":9,"num-classes":7, "row-exclude":1, "epochs":20, "batch-size":32, "learning-rate":0.002 }
             for (let field in fields_dict){
                 document.getElementById(field).value = fields_dict[field];
