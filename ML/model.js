@@ -88,7 +88,7 @@ export default class Model {
       callbacks: 
       [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
       { onEpochEnd: this.testCallback },
-      // { onTrainEnd: testModel },
+      { onTrainEnd: this.testModel.bind(this) },
       { onBatchEnd: () => this.model.stopTraining = this.stop_requested }]
 
     });
@@ -128,6 +128,32 @@ export default class Model {
     return pred.dataSync()
 
   }
+
+  testModel() {
+
+    let inputs = GLOBALS.dataset.normalizedTest
+    let labels = GLOBALS.dataset.testLabels.squeeze()
+  
+    tf.tidy(() => {
+      const values = this.model.predict(inputs);
+  
+      if (GLOBALS.mode == "Classification") {
+        let pred = values.argMax(1);
+        let result = pred.equal(labels.argMax(1));
+        let accuracy = result.sum().dataSync()[0] / result.shape[0];
+        //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
+        document.getElementById("console").innerHTML = "Accuracy: " + accuracy.toString();
+
+      } else if (GLOBALS.mode == "Regression") {
+        let error = tf.losses.meanSquaredError(labels, values.squeeze())
+        // document.getElementById("console").appendChild(document.createTextNode("Error: "+ error.dataSync().toString()));
+        document.getElementById("console").innerHTML = "Error: " + error.dataSync().toString();
+      }
+  
+    });
+  
+  }
+  
 
 
 

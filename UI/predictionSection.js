@@ -1,7 +1,7 @@
 import GLOBALS from "../config.js";
 
 
-export default class DataSection {
+export default class PredictionSection {
 
     constructor(file_id) {
         this.file_id = file_id
@@ -16,21 +16,21 @@ export default class DataSection {
         this.trainSplit=null
         this.valSplit=null
         this.testSplit=null
+        this.predictions = null
         
-        document.getElementById("preprocess").addEventListener("click", () => {
+        document.getElementById("preprocess-predict").addEventListener("click", () => {
             this.getDataOptions();
-            if( GLOBALS.mode == 'Classification'){
-                GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
-                    this.includedRows, this.trainSplit, this.numClasses);
-            }
-            else{
-                GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
-                    this.includedRows, this.trainSplit);
-            }
+            GLOBALS.datasetPredict.preprocessPredict(this.data, this.inputCols, this.includedRows, GLOBALS.dataset.trainMax, GLOBALS.dataset.trainMin);
             console.log("Done preprocessing")
-            console.log(GLOBALS.dataset)
           });
-
+        
+        document.getElementById("predict-button").addEventListener("click", () => {
+            this.predictions = GLOBALS.model.predict(GLOBALS.datasetPredict.normalizedPredict);
+          });
+        
+        document.getElementById("download-predictions").addEventListener("click", () => {
+            this.download_csv()
+          });
         
     }
 
@@ -59,6 +59,22 @@ export default class DataSection {
         //return matrix
     }
 
+    download_csv() {
+        let csv = 'Preds\n';
+        this.predictions.forEach(function (row) {
+          // if(row.join == 'undefined')
+          csv += row//.join(',');
+          csv += "\n";
+        });
+      
+        console.log(csv);
+        let hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'predictions.csv';
+        hiddenElement.click();
+      }
+
     parse_text(id) {
         let string = document.getElementById(id).value
         let numbers = [];
@@ -75,7 +91,6 @@ export default class DataSection {
         return numbers;
     }
 
-
     getIncludedRows(num_rows, excludeRows) {
         let keepRows = []
         for (let i = 0; i < num_rows; i++) {
@@ -86,15 +101,8 @@ export default class DataSection {
     }
 
     getDataOptions(){
-        this.inputCols = this.parse_text("features")
-        this.labelCols = this.parse_text("labels")
-        this.includedRows = this.getIncludedRows(this.data.length, this.parse_text("row-exclude"))
-        this.numClasses = parseInt(document.getElementById("num-classes").value);
-        
-        this.trainSplit = document.getElementById("train-split").value;
-        this.testSplit = document.getElementById("test-split").value;
-        this.valSplit = document.getElementById("val-split").value;
+        this.inputCols = this.parse_text("features-predict")
+        this.includedRows = this.getIncludedRows(this.data.length, this.parse_text("row-exclude-predict"))
     }
-
 
 }

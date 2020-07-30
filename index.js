@@ -1,7 +1,3 @@
-
-const predictFile = document.getElementById('fileuploadPredict');
-
-
 import GLOBALS from "./config.js";
 import Dataset from "./ML/dataset.js";
 import Model from "./ML/model.js";
@@ -11,112 +7,16 @@ import ModelSection from "./UI/modelSection.js";
 import IntroSection from "./UI/introSection.js";
 import Navigation from "./UI/navigation.js";
 import DataSection from "./UI/dataSection.js";
+import PredictionSection from "./UI/predictionSection.js";
 
 GLOBALS.navigation = new Navigation();
 GLOBALS.introSection = new IntroSection();
 GLOBALS.autofill = new Autofill();
 GLOBALS.dataSection = new DataSection('fileuploadTrain');
 GLOBALS.dataset = new Dataset();
-
 GLOBALS.modelSection = new ModelSection();
 GLOBALS.model = new Model();
 GLOBALS.trainOptionsSection = new TrainOptionsSection();
-
-
-
-function preprocess_predict(array, train_data) {
-  console.log(array.length)
-  input_cols_predict = parse_text("features-predict")
-  included_row_predict = included_rows(array.length, parse_text("row-exclude-predict"))
-
-  return tf.tidy(() => {
-
-    let data_matrix = tf.tensor2d(array, [array.length, array[0].length]).gather(included_row_predict, 0);
-    let inputTensor = data_matrix.gather(input_cols_predict, 1)
-
-    inputMax = train_data.max;
-    inputMin = train_data.min;
-
-    const normalizedPredict = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
-    normalizedPredict.print();
-
-    return normalizedPredict
-
-  });
-
-}
-
-
-
-document.getElementById("preprocess-predict").addEventListener("click", () => {
-  console.log("Start")
-  console.log(data.length)
-  predict_data = preprocess_predict(data, train_data);
-  console.log(predict_data.shape)
-});
-
-document.getElementById("predict-button").addEventListener("click", () => {
-  predictions = predict(predict_data);
-});
-
-function download_csv() {
-  let csv = 'Preds\n';
-  predictions.forEach(function (row) {
-    // if(row.join == 'undefined')
-    csv += row//.join(',');
-    csv += "\n";
-  });
-
-  console.log(csv);
-  let hiddenElement = document.createElement('a');
-  hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
-  hiddenElement.target = '_blank';
-  hiddenElement.download = 'predictions.csv';
-  hiddenElement.click();
-}
-
-function testModel() {
-
-  let inputs = test_data['inputs']
-  let labels = test_data['labels'].squeeze()
-  let results = [];
-
-  tf.tidy(() => {
-    const values = model.predict(inputs);
-
-    if (mode == "Classification") {
-      let pred = values.argMax(1);
-      let result = pred.equal(labels.argMax(1));
-      let accuracy = result.sum().dataSync()[0] / result.shape[0];
-      //document.getElementById("console").appendChild(document.createTextNode("Accuracy: "+accuracy.toString()));
-      document.getElementById("console").innerHTML = "Accuracy: " + accuracy.toString();
-    } else if (mode == "Regression") {
-      let error = tf.losses.meanSquaredError(labels, values.squeeze())
-      // document.getElementById("console").appendChild(document.createTextNode("Error: "+ error.dataSync().toString()));
-      document.getElementById("console").innerHTML = "Error: " + error.dataSync().toString();
-    }
-
-  });
-
-}
-
-// trainingFile.addEventListener("change", handleTrainFiles, false);
-// predictFile.addEventListener("change", handlePredictFiles, false);
-
-
-
-function show(shown, hidden) {
-  document.getElementById(shown).style.display = 'block';
-  document.getElementById(hidden).style.display = 'none';
-}
-
-
-
-
-
-
-
-
-
-
+GLOBALS.predictionSection = new PredictionSection('fileuploadPredict');
+GLOBALS.datasetPredict = new Dataset();
 
