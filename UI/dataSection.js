@@ -1,4 +1,5 @@
 import GLOBALS from "../config.js";
+import * as errorHandler from "./errorHandling.js";
 
 
 export default class DataSection {
@@ -18,17 +19,24 @@ export default class DataSection {
         this.testSplit=null
         
         document.getElementById("preprocess").addEventListener("click", () => {
-            this.getDataOptions();
-            if( GLOBALS.mode == 'Classification'){
-                GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
-                    this.includedRows, this.trainSplit, this.numClasses);
+
+            try{
+                this.getDataOptions();
+                if( GLOBALS.mode == 'Classification'){
+                    GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
+                        this.includedRows, this.trainSplit, this.numClasses);
+                }
+                else{
+                    GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
+                        this.includedRows, this.trainSplit);
+                }
+                console.log("Done preprocessing")
+                console.log(GLOBALS.dataset)
+            } catch(err) {
+                console.log(err)
+                document.getElementById(err.id+"-error").innerHTML = err.msg
+                // window.alert(err.msg);
             }
-            else{
-                GLOBALS.dataset.preprocessTrain(this.data, this.inputCols, this.labelCols, 
-                    this.includedRows, this.trainSplit);
-            }
-            console.log("Done preprocessing")
-            console.log(GLOBALS.dataset)
           });
 
         
@@ -60,24 +68,35 @@ export default class DataSection {
     }
 
     parse_text(id) {
+
         let string = document.getElementById(id).value
-        let numbers = [];
+        var numbers = [];
         for (let match of string.split(",")) {
             if (match.includes("-")) {
                 let [begin, end] = match.split("-");
+                
+                errorHandler.assertPositiveInteger(Number(begin), id);
+                errorHandler.assertPositiveInteger(Number(end), id);
+
                 for (let num = parseInt(begin); num <= parseInt(end); num++) {
                     numbers.push(num - 1);
                 }
+
             } else {
+
+                errorHandler.assertPositiveInteger(Number(match), id);
                 numbers.push(parseInt(match) - 1);
             }
         }
-        return numbers;
+
+
+        return numbers.sort();
     }
 
 
-    getIncludedRows(num_rows, excludeRows) {
+    getIncludedRows(id, num_rows, excludeRows) {
         let keepRows = []
+        errorHandler.assertLessThan(excludeRows[excludeRows.length-1], num_rows, id, "Excluded rows are out of dataset range")
         for (let i = 0; i < num_rows; i++) {
             if (excludeRows.indexOf(i) == -1)
                 keepRows.push(i);
@@ -86,9 +105,11 @@ export default class DataSection {
     }
 
     getDataOptions(){
-        this.inputCols = this.parse_text("features")
-        this.labelCols = this.parse_text("labels")
-        this.includedRows = this.getIncludedRows(this.data.length, this.parse_text("row-exclude"))
+        let dataSize = this.data.length;
+
+        this.inputCols = this.parse_text("features");
+        this.labelCols = this.parse_text("labels");
+        this.includedRows = this.getIncludedRows("row-exclude", this.data.length, this.parse_text("row-exclude"));
         this.numClasses = parseInt(document.getElementById("num-classes").value);
         
         this.trainSplit = document.getElementById("train-split").value;
