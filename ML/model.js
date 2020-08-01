@@ -7,27 +7,23 @@ export default class Model {
     this.modelDict = null;
     this.stop_requested = false;
 
-    document.getElementById("create-model").onclick = this.createModel.bind(this);
+   
     document.getElementById("train").onclick = this.trainModel.bind(this);
     document.getElementById("download").onclick = this.downloadModel.bind(this);
-    document.getElementById("loadModel").onclick = this.uploadModel.bind(this);
     document.getElementById("stop").onclick = () => {this.stop_requested = true};
 
   }
 
-  createModel() {
-
+  createModel(modelDict) {
+    this.model=tf.sequential();
     // Create a sequential mode
-    let modelSection = GLOBALS.modelSection;
-    this.modelDict = modelSection.parseLayers();
+   let num_features = GLOBALS.dataSection.inputCols.length;
 
-    let dataSection = GLOBALS.dataSection;
-
-    for (let key in this.modelDict) {
-      let num = this.modelDict[key].value;
-      let activ = this.modelDict[key].activation;
+    for (let key in modelDict) {
+      let num = modelDict[key].value;
+      let activ = modelDict[key].activation;
       if (key == 'layer-1') {
-        this.model.add(tf.layers.dense({ units: num, activation: activ, inputShape: [dataSection.inputCols.length] }));
+        this.model.add(tf.layers.dense({ units: num, activation: activ, inputShape: [num_features] }));
       }
       else {
         this.model.add(tf.layers.dense({ units: num, activation: activ }));
@@ -88,7 +84,7 @@ export default class Model {
       callbacks: 
       [tfvis.show.fitCallbacks({ name: 'Training Performance' }, tfvis_metrics, { height: 200, callbacks: ['onEpochEnd'] }),
       { onEpochEnd: this.testCallback },
-      { onTrainEnd: this.testModel.bind(this) },
+      { onTrainEnd: () => {if(GLOBALS.dataset.normalizedTest.size != 0) this.testModel()} },
       { onBatchEnd: () => this.model.stopTraining = this.stop_requested }]
 
     });
@@ -104,6 +100,7 @@ export default class Model {
 
   
   async uploadModel() {
+    this.model=tf.sequential();
     console.log("Uploading model ...")
     const uploadJSONInput = document.getElementById('fileuploadModelJson');
     const uploadWeightsInput = document.getElementById('fileuploadModelBin');
@@ -132,6 +129,7 @@ export default class Model {
   testModel() {
 
     let inputs = GLOBALS.dataset.normalizedTest
+    console.log("TestData:",inputs)
     let labels = GLOBALS.dataset.testLabels.squeeze()
   
     tf.tidy(() => {

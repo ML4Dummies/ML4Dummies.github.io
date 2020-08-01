@@ -4,12 +4,42 @@ export default class ModelSection{
 
     constructor(){
         this.countLayer = 0;
-
+        this.modelMode='customize'
+        
         document.getElementById("add-layer").addEventListener("click", () => {
             this.countLayer+=1;
             this.addLayer(this.countLayer, this.countLayer);
         });
 
+        let radioTable=document.getElementById('model-customize-radio');
+
+        let radioUpload=document.getElementById('model-upload-radio');
+       
+
+        radioTable.onclick = function() {
+            
+            document.getElementById("model-customize").style.display = "block";
+            this.modelMode='customize'
+            document.getElementById("model-upload").style.display = "none";
+        }
+        radioUpload.onclick = function() {
+            
+            document.getElementById("model-upload").style.display = "block";
+            this.modelMode='upload'
+            document.getElementById("model-customize").style.display = "none";
+
+        }
+
+    }
+
+    makeModel(){
+        if( this.modelMode == 'customize'){
+            let modelDict=this.parseLayers();
+            GLOBALS.model.createModel(modelDict);
+        }
+        else if(this.modelMode == 'upload'){
+            GLOBALS.model.uploadModel();
+        }
     }
 
     addLayer(layer_pos, name, disabled=false) {

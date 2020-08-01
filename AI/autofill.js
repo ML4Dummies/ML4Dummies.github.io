@@ -31,7 +31,7 @@ export default class Autofill {
             document.getElementById("layer-3").value = 150;
             document.getElementById("layer-final").value = 7;
             document.getElementById("train-split").value = 0.9;
-            document.getElementById("test-split").value = 0.1;
+            // document.getElementById("test-split").value = 0.1;
             document.getElementById("val-split").value = 0.1;
             document.getElementById("activ-1").value = "relu";
             document.getElementById("activ-2").value = "relu";
@@ -52,7 +52,7 @@ export default class Autofill {
             document.getElementById("layer-2").value = 100;
             document.getElementById("layer-final").value = 1;
             document.getElementById("train-split").value = 0.9;
-            document.getElementById("test-split").value = 0.1;
+            // document.getElementById("test-split").value = 0.1;
             document.getElementById("val-split").value = 0.1;
             document.getElementById("activ-1").value = "sigmoid";
             document.getElementById("activ-2").value = "sigmoid";
