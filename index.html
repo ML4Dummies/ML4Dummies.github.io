@@ -27,8 +27,8 @@
   <div class="container page-font">
     <!-- <div id="Page1" class="text-center h-75 card" > style="height:1000px"-->
     <div class="row vh-100 align-items-center">
-      <div class="col w-100 h-75 align-items-center">
-        <div id="Page1" class="card text-center h-100" style="display:flex">
+      <div class="w-100">
+        <div id="Page1" class="card text-center" style="display:flex; min-height:75vh">
           <div class="my-auto">Choose a machine learning algorithm:
             </br>
             <input type="radio" id="classification" name="MLType" value="Classification" checked>
@@ -40,7 +40,7 @@
         </div>
 
 
-        <div id="Page2" class="col card h-100" style="display:none">
+        <div id="Page2" class="col card" style="display:none; min-height:75vh">
           <div class="my-auto">
             <p class="text-center">Upload training data as a csv file:
               <input id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
@@ -126,7 +126,7 @@
           </div>
         </div>
 
-        <div id="Page3" class="col card text-center h-100" style="display:none">
+        <div id="Page3" class="col card text-center" style="display:none; min-height:75vh">
 
           <input type="radio" id="model-customize-radio" name="modelType" value="model-customize" checked>
           <label for="model-customize-radio">Customize Model</label>
@@ -172,42 +172,41 @@
           </div>
         </div>
 
-        <div id="Page4" class="col card h-100" style="display:none">
-          <div class="my-auto">
-            <div class="form-group">
-              <p><label for="epochs">Number of epochs</label>
-                <input type="text" class="form-control" id="epochs" name="epochs" class="w-50">
-              </p>
-              </br>
-              <p>
-                <label for="batch-size"> Batch size </label>
-                <input type="text" class="form-control" id="batch-size" name="batch-size">
-              </p>
-              </br>
-              <p><label for="lossDropdown">Loss</label>
-              <div id="lossDropdown"> </div>
-              </p>
+        <div id="Page4" class="col card" style="display:none; min-height:75vh">
+          <div class="form-group">
+            <p><label for="epochs">Number of epochs</label>
+              <input type="text" class="form-control" id="epochs" name="epochs" class="w-50">
+            </p>
+            </br>
+            <p>
+              <label for="batch-size"> Batch size </label>
+              <input type="text" class="form-control" id="batch-size" name="batch-size">
+            </p>
+            </br>
+            <p><label for="lossDropdown">Loss</label>
+            <div id="lossDropdown"> </div>
+            </p>
 
-              <p><label for="optimizerDropdown">Optimizer</label>
-              <div id="optimizerDropdown"> </div>
-              </p>
+            <p><label for="optimizerDropdown">Optimizer</label>
+            <div id="optimizerDropdown"> </div>
+            </p>
 
-              <p><label for="learning-rate">Learning rate</label>
-                <input type="text" class="form-control" id="learning-rate" name="learning-rate" class="w-50">
-              </p>
+            <p><label for="learning-rate">Learning rate</label>
+              <input type="text" class="form-control" id="learning-rate" name="learning-rate" class="w-50">
+            </p>
 
-              <p><label for="shuffle">Shuffle</label>
-                <input type="checkbox" id="shuffle" value=true checked>
-              </p>
+            <p><label for="shuffle">Shuffle</label>
+              <input type="checkbox" id="shuffle" value=true checked>
+            </p>
 
-            </div>
-
-
-            <!-- <button id="save-option" onmousedown="" type='button'>Save Options</button> -->
           </div>
+
+
+          <!-- <button id="save-option" onmousedown="" type='button'>Save Options</button> -->
+
         </div>
 
-        <div id="Page5" class="col card text-center h-100" style="display:none">
+        <div id="Page5" class="col card text-center" style="display:none; min-height:75vh">
           <div class="my-auto">
             <button id="train" type='button'>Train</button>
             <button id="stop" type='button'>Stop</button>
@@ -217,7 +216,7 @@
         </div>
 
 
-        <div id="Page6" class="col card text-center h-100" style="display:none">
+        <div id="Page6" class="col card text-center" style="display:none; min-height:75vh">
           <div class="my-auto">
             <p>Upload data to predict in csv format here:
               <input id="fileuploadPredict" name="predictData" accept=".csv" type="file" /></p>
