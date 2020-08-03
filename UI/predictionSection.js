@@ -1,4 +1,6 @@
 import GLOBALS from "../config.js";
+import * as errorHandler from "./errorHandling.js";
+import * as parseUtils from "./parseUtils.js"
 
 
 export default class PredictionSection {
@@ -6,7 +8,7 @@ export default class PredictionSection {
     constructor(file_id) {
         this.file_id = file_id
         this.data_element = document.getElementById(file_id);
-        this.data_element.addEventListener("change", this.parse.bind(this), false);
+        this.data_element.addEventListener("change",() => parseUtils.parse(this) , false);
         
         this.data=null
         this.inputCols=null
@@ -17,15 +19,21 @@ export default class PredictionSection {
         this.valSplit=null
         this.testSplit=null
         this.predictions = null
+        this.fieldsList = [this.file_id, "features-predict","row-exclude-predict"]
         
-        document.getElementById("preprocess-predict").addEventListener("click", () => {
-            this.getDataOptions();
-            GLOBALS.datasetPredict.preprocessPredict(this.data, this.inputCols, this.includedRows, GLOBALS.dataset.trainMax, GLOBALS.dataset.trainMin);
-            console.log("Done preprocessing")
-          });
         
         document.getElementById("predict-button").addEventListener("click", () => {
-            this.predictions = GLOBALS.model.predict(GLOBALS.datasetPredict.normalizedPredict);
+            errorHandler.clearErrors(this.fieldsList);
+            try {
+                this.getDataOptions();
+                GLOBALS.datasetPredict.preprocessPredict(this.data, this.inputCols, this.includedRows, GLOBALS.dataset.trainMax, GLOBALS.dataset.trainMin);
+                console.log("Done preprocessing")
+                this.predictions = GLOBALS.model.predict(GLOBALS.datasetPredict.normalizedPredict);
+            } catch(err) {
+                console.log(err)
+                document.getElementById(err.id + "-error").innerHTML = err.msg    
+            }
+            
           });
         
         document.getElementById("download-predictions").addEventListener("click", () => {
@@ -34,30 +42,7 @@ export default class PredictionSection {
         
     }
 
-    parse() {
-        // var file = this.data_element.files; 
-
-        $('#'+this.file_id).parse({
-            config: {
-                delimiter: ",",
-                header: false,
-                complete: this.load_dataset.bind(this)
-            },
-        })
-    }
-
-    load_dataset(results) {
-        var data = results.data;
-        var matrix = new Array();
-
-        for (let i = 0; i < data.length - 1; i++) {
-            var row = data[i];
-            var cells = row.map(Number);
-            matrix.push(cells);
-        }
-        this.data = matrix
-        //return matrix
-    }
+    
 
     download_csv() {
         let csv = 'Preds\n';
@@ -75,34 +60,36 @@ export default class PredictionSection {
         hiddenElement.click();
       }
 
-    parse_text(id) {
-        let string = document.getElementById(id).value
-        let numbers = [];
-        for (let match of string.split(",")) {
-            if (match.includes("-")) {
-                let [begin, end] = match.split("-");
-                for (let num = parseInt(begin); num <= parseInt(end); num++) {
-                    numbers.push(num - 1);
-                }
-            } else {
-                numbers.push(parseInt(match) - 1);
-            }
-        }
-        return numbers;
-    }
+    // parse_text(id) {
+    //     let string = document.getElementById(id).value
+    //     let numbers = [];
+    //     for (let match of string.split(",")) {
+    //         if (match.includes("-")) {
+    //             let [begin, end] = match.split("-");
+    //             for (let num = parseInt(begin); num <= parseInt(end); num++) {
+    //                 numbers.push(num - 1);
+    //             }
+    //         } else {
+    //             numbers.push(parseInt(match) - 1);
+    //         }
+    //     }
+    //     return numbers;
+    // }
 
-    getIncludedRows(num_rows, excludeRows) {
-        let keepRows = []
-        for (let i = 0; i < num_rows; i++) {
-            if (excludeRows.indexOf(i) == -1)
-                keepRows.push(i);
-        }
-        return keepRows
-    }
+    // getIncludedRows(num_rows, excludeRows) {
+    //     let keepRows = []
+    //     for (let i = 0; i < num_rows; i++) {
+    //         if (excludeRows.indexOf(i) == -1)
+    //             keepRows.push(i);
+    //     }
+    //     return keepRows
+    // }
 
     getDataOptions(){
-        this.inputCols = this.parse_text("features-predict")
-        this.includedRows = this.getIncludedRows(this.data.length, this.parse_text("row-exclude-predict"))
+        errorHandler.assertNotNull(this.data, this.file_id, "Upload your dataset file")
+        this.inputCols = parseUtils.parse_text("features-predict")
+        errorHandler.assertLessThan(this.inputCols, this.data[0].length, "features", "Columns out of dataset range")
+        this.includedRows = parseUtils.getIncludedRows("row-exclude-predict", this.data.length, parseUtils.parse_text("row-exclude-predict"))
     }
 
 }

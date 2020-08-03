@@ -70,6 +70,7 @@ export default class Model {
 
 
     if (options_dict['shuffle']){
+      console.log("shuffling")
       let indices = [...Array(inputs.shape[0]).keys()];
       tf.util.shuffle(indices);
       inputs = inputs.gather(indices, 0);
