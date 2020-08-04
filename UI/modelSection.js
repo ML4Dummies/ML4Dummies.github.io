@@ -11,6 +11,14 @@ export default class ModelSection{
             this.addLayer(this.countLayer, this.countLayer);
         });
 
+        document.getElementById("del-layer").addEventListener("click", () =>{
+            if(this.countLayer!=0){
+                this.deleteLayer(this.countLayer)
+                this.countLayer-=1
+            }
+
+        });
+
         let radioTable=document.getElementById('model-customize-radio');
 
         let radioUpload=document.getElementById('model-upload-radio');
@@ -40,6 +48,10 @@ export default class ModelSection{
         else if(this.modelMode == 'upload'){
             GLOBALS.model.uploadModel();
         }
+    }
+
+    deleteLayer(index){
+        document.getElementById("model-table").deleteRow(index); 
     }
 
     addLayer(layer_pos, name, disabled=false) {

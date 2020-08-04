@@ -42,11 +42,13 @@
 
         <div id="Page2" class="col card" style="display:none; min-height:75vh">
           <div class="my-auto">
-            <p class="text-center">Upload training data as a csv file:
-              <input id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
-              </br>
+            <div class="form mx-auto w-50">
+              <div class="custom-file">
+                <input class="custom-file-input" id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
+                <label class="custom-file-label" for="fileuploadTrain" >Upload training data as a csv file:</label>
+              </div>
               <span id="fileuploadTrain-error"></span>
-            </p>
+            </div>
             </br>
             <div class="form-group container">
               <p>
@@ -126,27 +128,37 @@
           </div>
         </div>
 
-        <div id="Page3" class="col card text-center" style="display:none; min-height:75vh">
+        <div id="Page3" class="col card" style="display:none; min-height:75vh">
+          <div class="text-center">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="model-customize-radio" name="modelType"
+                value="model-customize" checked>
+              <label class="form-check-label" for="model-customize-radio">Customize Model</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" id="model-upload-radio" name="modelType"
+                value="model-upload">
+              <label class="form-check-label" for="model-upload-radio">Upload Model</label>
+            </div>
+          </div>
+          <div class="my-auto mx-auto w-50" id="model-upload" style="display:none">
+            <div class="custom-file">
+              <input class="custom-file-input" id="fileuploadModelJson" name="my-model" accept=".json" type="file" />
+              <label class="custom-file-label" for="fileuploadModelJson">Choose model file (.json)</label>
+            </div>
 
-          <input type="radio" id="model-customize-radio" name="modelType" value="model-customize" checked>
-          <label for="model-customize-radio">Customize Model</label>
-          <input type="radio" id="model-upload-radio" name="modelType" value="model-upload">
-          <label for="model-upload-radio">Upload Model</label>
-
-          <div id="model-upload" style="display:none">
-            <p class="text-center">
-              Upload Model:
-              <input id="fileuploadModelJson" name="my-model" accept=".json" type="file" />
-              </br>
-              Upload Model Weights:
-              <input id="fileuploadModelBin" name="my-model" accept=".weights.bin" type="file" />
-              <!-- </br>
+            <div class="custom-file">
+              <input class="custom-file-input" id="fileuploadModelBin" name="my-model" accept=".weights.bin"
+                type="file" />
+              <label class="custom-file-label" for="fileuploadModelBin">Choose model weights file (.weights.bin)</label>
+            </div>
+            <!-- </br>
               <button class="btn btn-light" id="loadModel" type='button'>Load Model</button> -->
             </p>
           </div>
 
-          <div id="model-customize">
-            <div class="mt-5">
+          <div class="text-center" id="model-customize">
+            <div class="mt-5 my-auto">
               <!-- <h4> Create the model </h4> -->
 
               <div id="layer-customize" class="table-responsive">
@@ -168,7 +180,7 @@
             </div>
             <br>
             <button class="btn btn-light" id="add-layer" type='button'>Add Layer</button>
-            <!-- <button class="btn btn-info" id="create-model" type='button'>Create Model</button> -->
+            <button class="btn btn-light" id="del-layer" type='button'>Delete Layer</button>
           </div>
         </div>
 
@@ -220,8 +232,8 @@
           <div class="my-auto">
             <p>Upload data to predict in csv format here:
               <input id="fileuploadPredict" name="predictData" accept=".csv" type="file" /></p>
-              <span id="fileuploadPredict-error">
-              </span>
+            <span id="fileuploadPredict-error">
+            </span>
             <p><label for="features-predict">Which columns (in the same order as training data) contain data that you
                 like the model to use to make
                 predictions?</label>
@@ -231,12 +243,13 @@
               </span>
             </p>
             </br>
-            <label for="row-exclude-predict">Which rows in your dataset would you like to remove? (e.g. headers, invalid
+            <label for="row-exclude-predict">Which rows in your dataset would you like to remove? (e.g. headers,
+              invalid
               data)</label>
             <input type="text" class="form-control" id="row-exclude-predict" name="row-exclude"
               placeholder="1, 3-5, etc.">
-              <span id="row-exclude-predict-error">
-              </span>
+            <span id="row-exclude-predict-error">
+            </span>
             <br>
             <!-- <div class="text-center">
               <button class="btn btn-info" id="preprocess-predict" type='button'>Preprocess</button>
