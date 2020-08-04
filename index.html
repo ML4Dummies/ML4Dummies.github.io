@@ -220,20 +220,27 @@
           <div class="my-auto">
             <p>Upload data to predict in csv format here:
               <input id="fileuploadPredict" name="predictData" accept=".csv" type="file" /></p>
+              <span id="fileuploadPredict-error">
+              </span>
             <p><label for="features-predict">Which columns (in the same order as training data) contain data that you
                 like the model to use to make
                 predictions?</label>
               <input type="text" class="form-control" id="features-predict" name="features" placeholder="1, 3-5, etc.">
+              </br>
+              <span id="features-predict-error">
+              </span>
             </p>
             </br>
             <label for="row-exclude-predict">Which rows in your dataset would you like to remove? (e.g. headers, invalid
               data)</label>
             <input type="text" class="form-control" id="row-exclude-predict" name="row-exclude"
               placeholder="1, 3-5, etc.">
+              <span id="row-exclude-predict-error">
+              </span>
             <br>
-            <div class="text-center">
+            <!-- <div class="text-center">
               <button class="btn btn-info" id="preprocess-predict" type='button'>Preprocess</button>
-            </div>
+            </div> -->
             <button id="predict-button" type='button'>Predict</button>
             <button id='download-predictions'>Download CSV</button>
           </div>
