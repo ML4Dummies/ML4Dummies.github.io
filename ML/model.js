@@ -67,14 +67,6 @@ export default class Model {
 
     const batchSize = Number(options_dict['batch-size']);
     const epochs = Number(options_dict['epochs']);
-
-
-    if (options_dict['shuffle']){
-      let indices = [...Array(inputs.shape[0]).keys()];
-      tf.util.shuffle(indices);
-      inputs = inputs.gather(indices, 0);
-      labels = labels.gather(indices, 0);
-    }
     
 
     return await this.model.fit(inputs, labels, {

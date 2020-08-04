@@ -27,7 +27,7 @@ export default class TrainOptionsSection {
             [tf.losses.huberLoss, "Huber Loss"],
             [tf.losses.logLoss, "Log Loss"]];
 
-        this.options=["loss","optimizer","epochs","batch-size","shuffle", "learning-rate"];
+        this.options=["loss","optimizer","epochs","batch-size", "learning-rate"];
         
         this.lossOptions();
         this.optimOptions();
@@ -79,13 +79,13 @@ export default class TrainOptionsSection {
         for(let option of this.options){
           
           let optionDiv = document.getElementById(option);
-          if(option==='shuffle'){
-            dict[option] = optionDiv.checked;
-          }
-          else{
+        //   if(option==='shuffle'){
+        //     dict[option] = optionDiv.checked;
+        //   }
+        //   else{
             dict[option] = optionDiv.value;
             // console.log(optionDiv.value);
-          }
+        //   }
         }
         // console.log(dict)
        return dict

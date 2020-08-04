@@ -29,8 +29,8 @@ export default class Dataset {
 
         let inputTensor = this.filterData(data, inputCols, includedRows);
         let labelTensor = this.filterData(data, labelCols, includedRows, numClasses);
+        [inputTensor,labelTensor] = this.shuffle(inputTensor,labelTensor);
         
-
         let [trainData, testData] = this.trainTestSplit(inputTensor, trainSplit); //Features 
         let [trainLabels, testLabels] = this.trainTestSplit(labelTensor, trainSplit); // Labels
 
@@ -67,6 +67,14 @@ export default class Dataset {
         return tensor
 
     }
+
+    shuffle(inputs,labels){
+        let indices = [...Array(inputs.shape[0]).keys()];
+        tf.util.shuffle(indices);
+        inputs = inputs.gather(indices, 0);
+        labels = labels.gather(indices, 0);
+        return [inputs,labels]
+      }
 
     trainTestSplit(tensor, trainSplit=1){
         let size = tensor.shape[0]
