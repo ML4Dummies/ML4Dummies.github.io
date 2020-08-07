@@ -38,10 +38,9 @@ export default class TrainOptionsSection {
         
         let mode = GLOBALS.mode;
 
-        let lossDiv = document.getElementById("lossDropdown");
-        lossDiv.removeChild(lossDiv.firstChild);
-        let lossSelect = document.createElement("select");
-        lossSelect.id = "loss";
+        let lossSelect = document.getElementById("loss")
+        lossSelect.innerHTML = "";
+
                                
         let lossList = mode == "Classification" ? this.lossClassificationList : this.lossRegressionList;
     
@@ -51,16 +50,16 @@ export default class TrainOptionsSection {
             lossVar.text=lossList[i][1]
             lossSelect.add(lossVar)
         }
-    
-        lossDiv.appendChild(lossSelect)
+
     }
     
     
     optimOptions(){
    
-        let optimDiv = document.getElementById("optimizerDropdown");
-        let optimSelect = document.createElement("select");
-        optimSelect.id = "optimizer";
+        // let optimDiv = document.getElementById("optimizerDropdown");
+
+        let optimSelect = document.getElementById("optimizer");
+        optimSelect.innerHTML="";
 
         for(let i = 0; i < this.optimList.length; i++){
             let optimVar = document.createElement("option");
@@ -69,7 +68,6 @@ export default class TrainOptionsSection {
             optimSelect.add(optimVar)
         }
 
-        optimDiv.appendChild(optimSelect)
     }
 
     get_train_options(){

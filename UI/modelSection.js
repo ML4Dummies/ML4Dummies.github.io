@@ -38,7 +38,12 @@ export default class ModelSection{
 
         }
 
+        this.modelJson=document.getElementById("fileuploadModelJson")
+        this.modelWeightsBin=document.getElementById("fileuploadModelBin")
+        this.modelJson.addEventListener("change",() => parseUtils.updateUploadLabel(this.modelJson) , false);
+        this.modelWeightsBin.addEventListener("change",() => parseUtils.updateUploadLabel(this.modelWeightsBin), false);
     }
+
 
     makeModel(){
         if( this.modelMode == 'customize'){

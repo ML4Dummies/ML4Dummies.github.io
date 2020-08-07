@@ -5,7 +5,7 @@ export default class Navigation {
     constructor() {
 
         this.curr_page = 1;
-        this.num_pages = 6;
+        this.num_pages = 5;
 
         document.getElementById("next").onclick = this.next_page.bind(this);
         document.getElementById("back").onclick = this.prev_page.bind(this);
@@ -53,7 +53,7 @@ export default class Navigation {
                 // console.log(countLayer);
                 GLOBALS.dataSection.preprocess();
                 if (document.getElementById('layer-final') == null) {
-                    addLayer(countLayer + 1, "final", disabled = true)
+                    GLOBALS.autofill.modelFill();
                 }
                 break;
             case 3:

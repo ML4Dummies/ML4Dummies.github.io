@@ -8,7 +8,9 @@ export default class PredictionSection {
     constructor(file_id) {
         this.file_id = file_id
         this.data_element = document.getElementById(file_id);
-        this.data_element.addEventListener("change",() => parseUtils.parse(this) , false);
+        this.data_element.addEventListener("change",() => {
+          parseUtils.parse(this)
+          parseUtils.updateUploadLabel(this.data_element) }, false);
         
         this.data=null
         this.inputCols=null
@@ -29,6 +31,7 @@ export default class PredictionSection {
                 GLOBALS.datasetPredict.preprocessPredict(this.data, this.inputCols, this.includedRows, GLOBALS.dataset.trainMax, GLOBALS.dataset.trainMin);
                 console.log("Done preprocessing")
                 this.predictions = GLOBALS.model.predict(GLOBALS.datasetPredict.normalizedPredict);
+                this.download_csv()
             } catch(err) {
                 console.log(err)
                 document.getElementById(err.id + "-error").innerHTML = err.msg    
@@ -36,9 +39,9 @@ export default class PredictionSection {
             
           });
         
-        document.getElementById("download-predictions").addEventListener("click", () => {
-            this.download_csv()
-          });
+        // document.getElementById("download-predictions").addEventListener("click", () => {
+        //     
+        //   });
         
     }
 

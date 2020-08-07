@@ -10,10 +10,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-vis@1.0.2/dist/tfjs-vis.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/7.0.2/math.js"></script>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.2.0/papaparse.min.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
     integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+    integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+    integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+    integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+    crossorigin="anonymous"></script>
+
   <link rel="stylesheet" href="style.css">
 
 
@@ -36,58 +45,55 @@
             <input type="radio" id="regression" name="MLType" value="Regression">
             <label for="regression">Regression</label>
           </div>
-          <button id="autofill" type='button'>Autofill</button>
+          <button id="autofill" type='button' style="display:none">Autofill</button>
         </div>
 
 
         <div id="Page2" class="col card" style="display:none; min-height:75vh">
-          <div class="my-auto">
-            <div class="form mx-auto w-50">
-              <div class="custom-file">
-                <input class="custom-file-input" id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
-                <label class="custom-file-label" for="fileuploadTrain" >Upload training data as a csv file:</label>
-              </div>
-              <span id="fileuploadTrain-error"></span>
+
+          <div class="form mx-auto w-50 pt-5">
+            <div class="custom-file">
+              <input class="custom-file-input" id="fileuploadTrain" name="trainData" accept=".csv" type="file" />
+              <label class="custom-file-label" for="fileuploadTrain" id="fileuploadTrain-label">Upload training data as
+                a csv file</label>
             </div>
-            </br>
-            <div class="form-group container">
-              <p>
-                <label class="row" for="features">Which columns contain data that you like the model to use to make
-                  predictions?</label>
-                <input type="text" class="form-control row col-6" id="features" name="features"
-                  placeholder="1, 3-5, etc.">
-                <span>
-                  <p id="features-error"></p>
-                </span>
-              </p>
+            <div id="fileuploadTrain-error"></div>
+          </div>
+          </br>
+          <div class="form-group container my-auto pb-5">
+            <div class="pb-3">
+              <label for="features">Which columns contain data that you like the model to use to make
+                predictions?</label>
+              <input type="text" class="form-control col-6" id="features" name="features" placeholder="1, 3-5, etc.">
+              <div id="features-error"></div>
+            </div>
 
-              <p>
-                <label class="row" for="labels">Which columns contain data that you would like the model to predict?
-                </label>
-                <input type="text" class="form-control row col-6" id="labels" name="labels" placeholder="1, 3-5, etc.">
-                <span>
-                  <p id="labels-error"></p>
-                </span>
-              </p>
+            <div class="pb-3">
+              <label for="labels">Which columns contain data that you would like the model to predict?
+              </label>
+              <input type="text" class="form-control col-6" id="labels" name="labels" placeholder="1, 3-5, etc.">
 
-              <div id="num-classes-prompt">
-                <label class="row" for="num-classes-prompt">How many distinct categories can the predictions
-                  have?</label>
-                <input type="text" class="form-control row col-6" name="num-classes-prompt" id="num-classes">
-                <span>
-                  <p id="num-classes-error"></p>
-                </span>
-              </div>
+              <div id="labels-error"></div>
 
-              <label class="row" for="row-exclude">Which rows in your dataset would you like to remove? (e.g. headers,
+            </div>
+
+
+            <div class="pb-3" id="num-classes-prompt">
+              <label for="num-classes-prompt">How many distinct categories can the predictions
+                have?</label>
+              <input type="text" class="form-control col-6" name="num-classes-prompt" id="num-classes">
+              <div id="num-classes-error"></div>
+            </div>
+
+            <div class="pb-3">
+              <label for="row-exclude">Which rows in your dataset would you like to remove? (e.g. headers,
                 invalid
                 data)</label>
-              <input type="text" class="form-control row col-6" id="row-exclude" name="row-exclude"
+              <input type="text" class="form-control col-6" id="row-exclude" name="row-exclude"
                 placeholder="1, 3-5, etc.">
-              <span>
-                <p id="row-exclude-error"></p>
-              </span>
-              <!-- 
+              <div id="row-exclude-error"></div>
+            </div>
+            <!-- 
               <div class="row">
                 <div class="col-xs-2">
                   <label for="ex1">col-xs-2</label>
@@ -103,161 +109,185 @@
                 </div>
               </div> 
                -->
-              <label class="row" for="train-split">What fraction of the data do you want to use for training? (Test
-                fraction = 1 - Train fraction) </label>
-              <input type="text" class="form-control row col-6" id="train-split" name="train-split">
-              <span>
-                <p id="train-split-error"></p>
-              </span>
+
+            <button type="button" class="btn btn-light my-3" data-toggle="collapse"
+              data-target="#data-advanced-options">Advanced options</button>
+
+            <div class="collapse card p-3" id="data-advanced-options">
+
+              <div class="pb-3">
+                <label class="" for="train-split">What fraction of the data do you want to use for training? (Test
+                  fraction = 1 - Train fraction) </label>
+                <input type="text" class="form-control col-6" id="train-split" name="train-split">
+
+                <div id="train-split-error"></div>
+              </div>
+
+
 
               <!-- <label class="row" for="test-split">What fraction of the data do you want to use for testing?</label>
-                <input type="text" class="form-control row col-6" id="test-split" name="test-split" >
-                <span><p id="test-split-error"></p></span> -->
+                  <input type="text" class="form-control row col-6" id="test-split" name="test-split" >
+                  <span><p id="test-split-error"></p></span> -->
 
-              <label class="row" for="val-split">What fraction of the training data do you want to use for
-                validation?</label>
-              <input type="text" class="form-control row col-6" id="val-split" name="val-split">
-              <span>
-                <p id="val-split-error"></p>
-              </span>
+              <div class="pb-3">
+                <label for="val-split">What fraction of the training data do you want to use for
+                  validation?</label>
+                <input type="text" class="form-control col-6" id="val-split" name="val-split">
+                <div id="val-split-error"></div>
+              </div>
 
-              <!-- <div class="text-center">
+
+
+            </div>
+
+
+            <!-- <div class="text-center">
                 <button class="row btn btn-info" id="preprocess" type='button'>Preprocess</button>
               </div>               -->
-            </div>
           </div>
         </div>
 
         <div id="Page3" class="col card" style="display:none; min-height:75vh">
-          <div class="text-center">
-            <div class="form-check">
+          <div class="text-center py-5">
+            <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" id="model-customize-radio" name="modelType"
                 value="model-customize" checked>
-              <label class="form-check-label" for="model-customize-radio">Customize Model</label>
+              <label class="form-check-label" for="model-customize-radio">Customize model</label>
             </div>
-            <div class="form-check">
+            <div class="form-check form-check-inline">
               <input class="form-check-input" type="radio" id="model-upload-radio" name="modelType"
                 value="model-upload">
-              <label class="form-check-label" for="model-upload-radio">Upload Model</label>
+              <label class="form-check-label" for="model-upload-radio">Upload model</label>
             </div>
           </div>
           <div class="my-auto mx-auto w-50" id="model-upload" style="display:none">
-            <div class="custom-file">
+            <div class="custom-file py-4">
               <input class="custom-file-input" id="fileuploadModelJson" name="my-model" accept=".json" type="file" />
-              <label class="custom-file-label" for="fileuploadModelJson">Choose model file (.json)</label>
+              <label class="custom-file-label" for="fileuploadModelJson" id="fileuploadModelJson-label">Choose model
+                file (.json)</label>
             </div>
 
-            <div class="custom-file">
+            <div class="custom-file py-4">
               <input class="custom-file-input" id="fileuploadModelBin" name="my-model" accept=".weights.bin"
                 type="file" />
-              <label class="custom-file-label" for="fileuploadModelBin">Choose model weights file (.weights.bin)</label>
+              <label class="custom-file-label" for="fileuploadModelBin" id="fileuploadModelBin-label">Choose model
+                weights file (.weights.bin)</label>
             </div>
             <!-- </br>
               <button class="btn btn-light" id="loadModel" type='button'>Load Model</button> -->
             </p>
           </div>
 
-          <div class="text-center" id="model-customize">
-            <div class="mt-5 my-auto">
-              <!-- <h4> Create the model </h4> -->
+          <div class="text-center my-5" id="model-customize">
 
-              <div id="layer-customize" class="table-responsive">
-                <table class="table table-hover" id="model-table">
-                  <thead>
-                    <tr>
-                      <th scope="col">Layer</th>
-                      <th scope="col">Number of nodes</th>
-                      <th scope="col">Activation</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  </tbody>
-                </table>
+            <!-- <h4> Create the model </h4> -->
 
-              </div>
-              <div id="classification-layer">
-              </div>
+            <div id="layer-customize" class="table-responsive">
+              <table class="table table-hover" id="model-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Layer</th>
+                    <th scope="col">Number of nodes</th>
+                    <th scope="col">Activation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+
             </div>
+            <div id="classification-layer">
+            </div>
+
             <br>
             <button class="btn btn-light" id="add-layer" type='button'>Add Layer</button>
             <button class="btn btn-light" id="del-layer" type='button'>Delete Layer</button>
           </div>
         </div>
 
-        <div id="Page4" class="col card" style="display:none; min-height:75vh">
-          <div class="form-group">
-            <p><label for="epochs">Number of epochs</label>
-              <input type="text" class="form-control" id="epochs" name="epochs" class="w-50">
-            </p>
-            </br>
-            <p>
-              <label for="batch-size"> Batch size </label>
-              <input type="text" class="form-control" id="batch-size" name="batch-size">
-            </p>
-            </br>
-            <p><label for="lossDropdown">Loss</label>
-            <div id="lossDropdown"> </div>
-            </p>
 
-            <p><label for="optimizerDropdown">Optimizer</label>
-            <div id="optimizerDropdown"> </div>
-            </p>
+        <div id="Page4" class="col card text-center" style="display:none; min-height:75vh">
+          <div class="my-auto">
+            <button id="train" type='button' class="btn btn-outline-success">Train</button>
+            <button id="stop" type='button' class="btn btn-outline-danger">Stop</button>
+            <button id="download" type='button' class="btn btn-outline-secondary">Download model</button>
+            <div id="console"></div>
+          </div>
 
-            <p><label for="learning-rate">Learning rate</label>
-              <input type="text" class="form-control" id="learning-rate" name="learning-rate" class="w-50">
-            </p>
+          <button type="button" class="btn btn-light my-3 " data-toggle="collapse"
+            data-target="#train-advanced-options">Advanced options</button>
+
+          <div class="collapse card my-3 px-5" id="train-advanced-options">
+            <div class="form-group row pt-3">
+              <label for="epochs" class="col-3 col-form-label">Number of epochs</label>
+              <input type="text" class="form-control col-3" id="epochs" name="epochs">
+
+              <label for="loss" class="col-3 col-form-label">Loss</label>
+              <select id="loss" class="form-control col-3"> </select>
+
+            </div>
+
+            <div class="form-group row">
+              <label for="batch-size" class="col-3 col-form-label"> Batch size </label>
+              <input type="text" class="form-control col-3" id="batch-size" name="batch-size">
+
+              <label for="optimizer" class="col-3 col-form-label">Optimizer</label>
+              <select id="optimizer" class="form-control col-3"> </select>
+
+            </div>
+
+            <div class="form-group row">
+              <label for="learning-rate" class="col-3 col-form-label">Learning rate</label>
+              <input type="text" class="form-control col-3" id="learning-rate" name="learning-rate">
+            </div>
 
             <!-- <p><label for="shuffle">Shuffle</label>
               <input type="checkbox" id="shuffle" value=true checked>
             </p> -->
 
           </div>
-
-
-          <!-- <button id="save-option" onmousedown="" type='button'>Save Options</button> -->
-
         </div>
 
-        <div id="Page5" class="col card text-center" style="display:none; min-height:75vh">
-          <div class="my-auto">
-            <button id="train" type='button'>Train</button>
-            <button id="stop" type='button'>Stop</button>
-            <button id="download" type='button'>Download model</button>
-            <div id="console"></div>
+
+        <div id="Page5" class="col card" style="display:none; min-height:75vh">
+
+          <div class="form mx-auto w-50 pt-5">
+            <div class="custom-file">
+              <input class="custom-file-input" id="fileuploadPredict" name="predictData" accept=".csv" type="file" />
+              <label class="custom-file-label" for="fileuploadPredict" id="fileuploadPredict-label">Upload data to predict as
+                a csv file</label>
+            </div>
+            <div id="fileuploadPredict-error"></div>
+          </div>
+
+          <div class="form-group container my-auto py-5">
+            <div class="pb-3">
+              <label for="features-predict">Which columns (in the same order as training data) contain data that you
+                like the model to use to make predictions?</label>
+              <input type="text" class="form-control col-6" id="features-predict" name="features-predict" placeholder="1, 3-5, etc.">
+              <div id="features-predict-error"></div>
+            </div>
+
+            <div class="pb-3">
+              <label for="row-exclude-predict">Which rows in your dataset would you like to remove? (e.g. headers,
+                invalid data)
+              </label>
+              <input type="text" class="form-control col-6" id="row-exclude-predict" name="row-exclude"
+                placeholder="1, 3-5, etc.">
+
+              <div id="row-exclude-predict-error"></div>
+
+              
+              
+            </div>
+            <div class="text-center pt-3">
+              <!-- <button class="btn btn-light" id='download-predictions'>Download CSV</button> -->
+              <button class="btn btn-light" id="predict-button" type='button'>Predict</button>
+            </div>
+            
           </div>
         </div>
 
-
-        <div id="Page6" class="col card text-center" style="display:none; min-height:75vh">
-          <div class="my-auto">
-            <p>Upload data to predict in csv format here:
-              <input id="fileuploadPredict" name="predictData" accept=".csv" type="file" /></p>
-            <span id="fileuploadPredict-error">
-            </span>
-            <p><label for="features-predict">Which columns (in the same order as training data) contain data that you
-                like the model to use to make
-                predictions?</label>
-              <input type="text" class="form-control" id="features-predict" name="features" placeholder="1, 3-5, etc.">
-              </br>
-              <span id="features-predict-error">
-              </span>
-            </p>
-            </br>
-            <label for="row-exclude-predict">Which rows in your dataset would you like to remove? (e.g. headers,
-              invalid
-              data)</label>
-            <input type="text" class="form-control" id="row-exclude-predict" name="row-exclude"
-              placeholder="1, 3-5, etc.">
-            <span id="row-exclude-predict-error">
-            </span>
-            <br>
-            <!-- <div class="text-center">
-              <button class="btn btn-info" id="preprocess-predict" type='button'>Preprocess</button>
-            </div> -->
-            <button id="predict-button" type='button'>Predict</button>
-            <button id='download-predictions'>Download CSV</button>
-          </div>
-        </div>
 
         <div>
           </br>

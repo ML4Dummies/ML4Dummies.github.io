@@ -8,8 +8,6 @@ export default class Dataset {
         this.inputCols = null;
         this.labelCols = null;
         this.includedRows = null;
-        this.numClasses = null;
-        this.datasetSize = null;
         this.trainSize = null;
         this.testSize - null;
         this.trainSplit = null;
@@ -33,6 +31,7 @@ export default class Dataset {
         
         let [trainData, testData] = this.trainTestSplit(inputTensor, trainSplit); //Features 
         let [trainLabels, testLabels] = this.trainTestSplit(labelTensor, trainSplit); // Labels
+
 
         
         this.trainMax = trainData.max(0)
@@ -78,11 +77,11 @@ export default class Dataset {
 
     trainTestSplit(tensor, trainSplit=1){
         let size = tensor.shape[0]
-        let trainSize = parseInt(size * trainSplit)
-        let testSize = size-trainSize
+        this.trainSize = parseInt(size * trainSplit)
+        this.testSize = size-this.trainSize
 
-        let trainData = tf.slice(tensor, 0, trainSize)
-        let testData = tf.slice(tensor, trainSize, testSize)
+        let trainData = tf.slice(tensor, 0, this.trainSize)
+        let testData = tf.slice(tensor, this.trainSize, this.testSize)
 
         return [trainData, testData]
     }

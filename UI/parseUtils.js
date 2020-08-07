@@ -51,14 +51,11 @@ export function parse(obj) {
         data = matrix
         obj.data = data;
     }
-
-    $('#'+ obj.file_id).parse({
-        config: {
-            delimiter: ",",
-            header: false,
-            complete: load_dataset
-        },
-     
-    })
+    Papa.parse(document.getElementById(obj.file_id).files[0], {complete: load_dataset, delimiter: ",", header:false})
     
+}
+
+export function updateUploadLabel(file){
+    var fileName = file.value.split("\\").pop();
+    document.getElementById(file.id + "-label").innerHTML = fileName;
 }

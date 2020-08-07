@@ -8,7 +8,10 @@ export default class DataSection {
     constructor(file_id) {
         this.file_id = file_id
         this.data_element = document.getElementById(file_id);
-        this.data_element.addEventListener("change",() => parseUtils.parse(this) , false);
+        this.data_element.addEventListener("change",() => {
+            parseUtils.parse(this);
+            parseUtils.updateUploadLabel(this.data_element)}, false);
+        
 
         this.data = null
         this.inputCols = null
@@ -21,6 +24,7 @@ export default class DataSection {
         this.fieldsList = [this.file_id, "features", "labels", "row-exclude", "num-classes",
             "train-split", "val-split"]
     }
+
 
     preprocess() {
 
