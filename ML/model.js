@@ -6,11 +6,14 @@ export default class Model {
     this.model = tf.sequential();
     this.modelDict = null;
     this.stop_requested = false;
+    this.visor = tfvis.visor();
+    this.visor.close();
 
    
-    document.getElementById("train").onclick = this.trainModel.bind(this);
+    document.getElementById("train").onclick = () => {GLOBALS.modelSection.makeModel(); this.trainModel(), this.visor.open()}; //reseting model every time we train
     document.getElementById("download").onclick = this.downloadModel.bind(this);
     document.getElementById("stop").onclick = () => {this.stop_requested = true};
+    document.getElementById("visualize").onclick = () => {this.visor.toggle()};
 
   }
 

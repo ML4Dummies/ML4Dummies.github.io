@@ -65,7 +65,7 @@ export default class Autofill {
     }
 
     defaultFill(){
-        let fields_dict = {"epochs":20, "batch-size":32, "learning-rate":0.002, 'train-split':0.9, "val-split":0.1}
+        let fields_dict = {"epochs":100, "batch-size":32, "learning-rate":0.002, 'train-split':0.9, "val-split":0.1}
         for (let field in fields_dict){
             document.getElementById(field).value = fields_dict[field];
         }
@@ -77,7 +77,7 @@ export default class Autofill {
         let trainSize = GLOBALS.dataset.trainSize;
         let numFeatures = GLOBALS.dataSection.inputCols.length;
         let alpha = 2;
-        let numHidden = trainSize/(alpha*(numClasses + numFeatures));
+        let numHidden = Math.round(trainSize/(alpha*(numClasses + numFeatures)));
         let mode = GLOBALS.mode;
         let addLayer = GLOBALS.modelSection.addLayer;
 

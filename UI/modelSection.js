@@ -1,4 +1,5 @@
 import GLOBALS from "../config.js"
+import * as parseUtils from "./parseUtils.js"
 
 export default class ModelSection{
 
