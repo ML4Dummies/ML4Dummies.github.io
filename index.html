@@ -45,6 +45,10 @@
               let response = fetch("http://localhost/api/library").then(response => response.json().then((data) => { return { 'data': data, 'status': response.status } }))
               console.log(response)
             </script>
+             <form onsubmit="myFunction(event){console.log(event.target.files[0])}">
+              upload file: <input type="file">
+              <input type="submit">
+             </form> 
             </br>
             <input type="radio" id="classification" name="MLType" value="Classification" checked>
             <label for="classification">Classification</label>
